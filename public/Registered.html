@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Registered Facilities - Sindh Healthcare Commission</title>
+  <link rel="shortcut icon" type="image/png" href="../assets/images/logos/favicon.png" />
+  <link rel="stylesheet" href="../assets/css/styles.min.css" />
+  <style>
+    .facility-card {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .status-badge {
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .status-badge.registered {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .pagination button {
+      margin: 0 5px;
+      padding: 5px 10px;
+      border: 1px solid #ddd;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .pagination button.active {
+      background: #007bff;
+      color: #fff;
+      border-color: #007bff;
+    }
+  </style>
+</head>
+
+<body>
+  <!--  Body Wrapper -->
+  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+    data-sidebar-position="fixed" data-header-position="fixed">
+
+    <!-- Sidebar Start -->
+    <aside class="left-sidebar">
+      <!-- Sidebar scroll-->
+      <div>
+        <div class="brand-logo d-flex align-items-center justify-content-between">
+          <a href="./index.html" class="text-nowrap logo-img">
+            <img style="height: 90px;" src="../assets/images/logos/logo.png" alt="" />
+          </a>
+          <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
+            <i class="ti ti-x fs-6"></i>
+          </div>
+        </div>
+        <!-- Sidebar navigation-->
+        <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
+          <ul id="sidebarnav">
+            <li class="nav-small-cap">
+              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+              <span class="hide-menu">Home</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="./index.html" aria-expanded="false">
+                <i class="ti ti-dashboard"></i>
+                <span class="hide-menu">Dashboard</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="./reporting.html" aria-expanded="false">
+                <i class="ti ti-chart-bar"></i>
+                <span class="hide-menu">Reports</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="./facility.html" aria-expanded="false">
+                <i class="ti ti-list-check"></i>
+                <span class="hide-menu">List of Facility</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="./registered.html" aria-expanded="false">
+                <i class="ti ti-list-check"></i>
+                <span class="hide-menu">Registered</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="./unregistered.html" aria-expanded="false">
+                <i class="ti ti-pencil"></i>
+                <span class="hide-menu">UnRegistered</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="authentication-login.html" aria-expanded="false">
+                <i class="ti ti-list"></i>
+                <span class="hide-menu">Signout</span>
+              </a>
+            </li>
+          </ul>
+          <div class="unlimited-access hide-menu bg-light-secondary position-relative mb-7 mt-5 rounded">
+            <div class="d-flex">
+              <div class="unlimited-access-title me-3">
+                <h6 class="fw-semibold fs-4 mb-6 text-dark w-85">Sindh Healthcare Commission</h6>
+                <a href="https://adminmart.com/product/modernize-bootstrap-5-admin-template/?ref=56" target="_blank"
+                  class="btn btn-secondary fs-2 fw-semibold">Check</a>
+              </div>
+              <div class="unlimited-access-img">
+                <img src="../assets/images/backgrounds/rocket.png" alt="" class="img-fluid">
+              </div>
+            </div>
+          </div>
+        </nav>
+        <!-- End Sidebar navigation -->
+      </div>
+      <!-- End Sidebar scroll-->
+    </aside>
+    <!--  Sidebar End -->
+    <!--  Main wrapper -->
+    <div class="body-wrapper">
+      <!--  Header Start -->
+      <header class="app-header">
+        <nav class="navbar navbar-expand-lg navbar-light">
+          <ul class="navbar-nav">
+            <li class="nav-item d-block d-xl-none">
+              <a class="nav-link sidebartoggler " id="headerCollapse" href="javascript:void(0)">
+                <i class="ti ti-menu-2"></i>
+              </a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link " href="javascript:void(0)" id="drop1" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="ti ti-bell"></i>
+                <div class="notification bg-primary rounded-circle"></div>
+              </a>
+              <div class="dropdown-menu dropdown-menu-animate-up" aria-labelledby="drop1">
+                <div class="message-body">
+                  <a href="javascript:void(0)" class="dropdown-item">
+                    Item 1
+                  </a>
+                  <a href="javascript:void(0)" class="dropdown-item">
+                    Item 2
+                  </a>
+                </div>
+              </div>
+            </li>
+          </ul>
+          <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
+            <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
+              <li class="nav-item dropdown">
+                <a class="nav-link " href="javascript:void(0)" id="drop2" data-bs-toggle="dropdown"
+                  aria-expanded="false">
+                  <img src="../assets/images/profile/user-1.jpg" alt="" width="35" height="35" class="rounded-circle">
+                </a>
+                <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop2">
+                  <div class="message-body">
+                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
+                      <i class="ti ti-user fs-6"></i>
+                      <p class="mb-0 fs-3">My Profile</p>
+                    </a>
+                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
+                      <i class="ti ti-mail fs-6"></i>
+                      <p class="mb-0 fs-3">My Account</p>
+                    </a>
+                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
+                      <i class="ti ti-list-check fs-6"></i>
+                      <p class="mb-0 fs-3">My Task</p>
+                    </a>
+                    <a href="./authentication-login.html" class="btn btn-outline-primary mx-3 mt-2 d-block">Logout</a>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </nav>
+      </header>
+      <!--  Header End -->
+      <div class="body-wrapper-inner">
+        <div class="container-fluid">
+          <!--  Row 1 -->
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="facility-card">
+                <h5 class="card-title fw-semibold">Registered Facilities</h5>
+                <div class="row mb-4">
+                  <div class="col-md-4">
+                    <label for="cityFilter" class="form-label">Filter by City</label>
+                    <select class="form-select" id="cityFilter">
+                      <option value="">All Cities</option>
+                      <option value="Karachi">Karachi</option>
+                      <option value="Hyderabad">Hyderabad</option>
+                      <option value="Sukkur">Sukkur</option>
+                      <option value="Larkana">Larkana</option>
+                      <option value="Mirpur Khas">Mirpur Khas</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4">
+                    <label for="searchFacility" class="form-label">Search Facility</label>
+                    <input type="text" class="form-control" id="searchFacility" placeholder="Enter facility name">
+                  </div>
+                  <div class="col-md-4">
+                    <label for="itemsPerPage" class="form-label">Items per Page</label>
+                    <select class="form-select" id="itemsPerPage">
+                      <option value="5">5</option>
+                      <option value="10">10</option>
+                      <option value="20">20</option>
+                      <option value="50">50</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="table-responsive">
+                  <table class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th>Facility Name</th>
+                        <th>City</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="facilityTable">
+                      <!-- Facility rows will be dynamically populated here -->
+                    </tbody>
+                  </table>
+                </div>
+                <div class="pagination" id="pagination">
+                  <!-- Pagination buttons will be dynamically populated here -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
+  <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/sidebarmenu.js"></script>
+  <script src="../assets/js/app.min.js"></script>
+  <script>
+    // Sample data for facilities
+    const facilities = [
+      { name: "ABC Hospital", city: "Karachi", status: "registered", date: "2025-03-01" },
+      { name: "XYZ Clinic", city: "Hyderabad", status: "registered", date: "2025-03-15" },
+      { name: "PQR Diagnostic Center", city: "Sukkur", status: "registered", date: "2025-03-10" },
+      { name: "LMN Pharmacy", city: "Larkana", status: "registered", date: "2025-03-05" },
+      { name: "EFG Lab", city: "Mirpur Khas", status: "registered", date: "2025-03-20" },
+      { name: "RST Medical Center", city: "Karachi", status: "registered", date: "2025-03-25" },
+      // Add more facilities as needed
+    ];
+
+    // Pagination variables
+    let currentPage = 1;
+    let itemsPerPage = 5;
+
+    // Function to render facilities table
+    function renderFacilities(filteredFacilities, page = 1) {
+      const tableBody = document.getElementById("facilityTable");
+      tableBody.innerHTML = "";
+
+      // Sort facilities by date (newest first)
+      filteredFacilities.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      // Calculate pagination
+      const startIndex = (page - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const paginatedFacilities = filteredFacilities.slice(startIndex, endIndex);
+
+      // Render rows
+      paginatedFacilities.forEach(facility => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${facility.name}</td>
+          <td>${facility.city}</td>
+          <td>
+            <span class="status-badge registered">Registered</span>
+          </td>
+          <td>${facility.date}</td>
+          <td>
+            <button class="btn btn-sm btn-primary">Edit</button>
+            <button class="btn btn-sm btn-danger">Delete</button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+
+      // Render pagination
+      renderPagination(filteredFacilities.length, page);
+    }
+
+    // Function to render pagination
+    function renderPagination(totalItems, currentPage) {
+      const paginationDiv = document.getElementById("pagination");
+      paginationDiv.innerHTML = "";
+
+      const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+      for (let i = 1; i <= totalPages; i++) {
+        const button = document.createElement("button");
+        button.innerText = i;
+        button.classList.add("btn", "btn-sm");
+        if (i === currentPage) {
+          button.classList.add("active");
+        }
+        button.addEventListener("click", () => {
+          currentPage = i;
+          filterFacilities();
+        });
+        paginationDiv.appendChild(button);
+      }
+    }
+
+    // Function to filter facilities
+    function filterFacilities() {
+      const cityFilter = document.getElementById("cityFilter").value.toLowerCase();
+      const searchQuery = document.getElementById("searchFacility").value.toLowerCase();
+
+      const filteredFacilities = facilities.filter(facility => {
+        const matchesCity = cityFilter ? facility.city.toLowerCase() === cityFilter : true;
+        const matchesSearch = searchQuery ? facility.name.toLowerCase().includes(searchQuery) : true;
+
+        return matchesCity && matchesSearch;
+      });
+
+      renderFacilities(filteredFacilities, currentPage);
+    }
+
+    // Initial render
+    filterFacilities();
+
+    // Add event listeners for filters
+    document.getElementById("cityFilter").addEventListener("change", filterFacilities);
+    document.getElementById("searchFacility").addEventListener("input", filterFacilities);
+    document.getElementById("itemsPerPage").addEventListener("change", function () {
+      itemsPerPage = parseInt(this.value);
+      filterFacilities();
+    });
+  </script>
+</body>
+
+</html>

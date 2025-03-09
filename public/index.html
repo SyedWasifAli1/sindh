@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Modernize Free Bootstrap Admin Template by Adminmart</title>
+  <link rel="shortcut icon" type="image/png" href="../assets/images/logos/favicon.png" />
+  <link rel="stylesheet" href="../assets/css/styles.min.css" />
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <!-- Bootstrap CSS (if using Bootstrap) -->
+  <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+  <style>
+    #map {
+      height: 300px;
+      /* Fixed height */
+      width: 100%;
+      /* Full width */
+      z-index: 1;
+      /* Ensure it stays above other elements */
+      position: relative;
+    }
+
+    .card-body,
+    .card,
+    .col-lg-8 {
+      overflow: visible !important;
+      /* Ensure no overflow is hidden */
+    }
+  </style>
+
+</head>
+
+<body>
+  <!--  Body Wrapper -->
+  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+    data-sidebar-position="fixed" data-header-position="fixed">
+
+    <!-- Sidebar Start -->
+    <aside class="left-sidebar">
+      <!-- Sidebar scroll-->
+      <div>
+        <div class="brand-logo d-flex align-items-center justify-content-between">
+          <a href="./index.html" class="text-nowrap logo-img">
+            <img style="height: 90px;" src="../assets/images/logos/logo.png" alt="" />
+          </a>
+          <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
+            <i class="ti ti-x fs-6"></i>
+          </div>
+        </div>
+        <!-- Sidebar navigation-->
+        <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
+          <ul id="sidebarnav">
+            <li class="nav-small-cap">
+              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+              <span class="hide-menu">Home</span>
+            </li>
+
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="./index.html" aria-expanded="false">
+                <i class="ti ti-dashboard"></i>
+                <span class="hide-menu">Dashboard</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="./reporting.html" aria-expanded="false">
+                <i class="ti ti-chart-bar"></i>
+                <span class="hide-menu">Reports</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="./facility.html" aria-expanded="false">
+                <i class="ti ti-list-check"></i>
+                <span class="hide-menu">List of Facility</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="./Registered.html" aria-expanded="false">
+                <i class="ti ti-list-check"></i>
+                <span class="hide-menu">Registered</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="./unregistered.html" aria-expanded="false">
+                <i class="ti  ti-pencil"></i>
+                <span class="hide-menu">UnRegistered</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="./authentication-login.html" aria-expanded="false">
+                <i class="ti ti-list"></i>
+                <span class="hide-menu">Signout</span>
+              </a>
+            </li>
+
+
+          </ul>
+          <div class="unlimited-access hide-menu bg-light-secondary position-relative mb-7 mt-5 rounded">
+            <div class="d-flex">
+              <div class="unlimited-access-title me-3">
+                <h6 class="fw-semibold fs-4 mb-6 text-dark w-85">Sindh Healthcare Commission</h6>
+                <!-- <h6 class="fw-semibold fs-4 mb-6 text-dark w-85">Check Pro Version</h6> -->
+                <a href="https://adminmart.com/product/modernize-bootstrap-5-admin-template/?ref=56" target="_blank"
+                  class="btn btn-secondary fs-2 fw-semibold">Check</a>
+              </div>
+              <div class="unlimited-access-img">
+                <img src="../assets/images/backgrounds/rocket.png" alt="" class="img-fluid">
+              </div>
+            </div>
+          </div>
+        </nav>
+        <!-- End Sidebar navigation -->
+      </div>
+      <!-- End Sidebar scroll-->
+    </aside>
+    <!--  Sidebar End -->
+    <!--  Main wrapper -->
+    <div class="body-wrapper">
+      <!--  Header Start -->
+      <header class="app-header">
+        <nav class="navbar navbar-expand-lg navbar-light">
+          <ul class="navbar-nav">
+            <li class="nav-item d-block d-xl-none">
+              <a class="nav-link sidebartoggler " id="headerCollapse" href="javascript:void(0)">
+                <i class="ti ti-menu-2"></i>
+              </a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link " href="javascript:void(0)" id="drop1" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="ti ti-bell"></i>
+                <div class="notification bg-primary rounded-circle"></div>
+              </a>
+              <div class="dropdown-menu dropdown-menu-animate-up" aria-labelledby="drop1">
+                <div class="message-body">
+                  <a href="javascript:void(0)" class="dropdown-item">
+                    Item 1
+                  </a>
+                  <a href="javascript:void(0)" class="dropdown-item">
+                    Item 2
+                  </a>
+                </div>
+              </div>
+            </li>
+          </ul>
+          <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
+            <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
+              <!-- <a href="https://adminmart.com/product/modernize-bootstrap-5-admin-template/?ref=56" target="_blank"
+                class="btn btn-primary">Check Pro Template</a> -->
+              <li class="nav-item dropdown">
+                <a class="nav-link " href="javascript:void(0)" id="drop2" data-bs-toggle="dropdown"
+                  aria-expanded="false">
+                  <img src="../assets/images/profile/user-1.jpg" alt="" width="35" height="35" class="rounded-circle">
+                </a>
+                <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop2">
+                  <div class="message-body">
+                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
+                      <i class="ti ti-user fs-6"></i>
+                      <p class="mb-0 fs-3">My Profile</p>
+                    </a>
+                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
+                      <i class="ti ti-mail fs-6"></i>
+                      <p class="mb-0 fs-3">My Account</p>
+                    </a>
+                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
+                      <i class="ti ti-list-check fs-6"></i>
+                      <p class="mb-0 fs-3">My Task</p>
+                    </a>
+                    <a href="./authentication-login.html" class="btn btn-outline-primary mx-3 mt-2 d-block">Logout</a>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </nav>
+      </header>
+      <!--  Header End -->
+      <div class="body-wrapper-inner">
+        <div class="container-fluid">
+          <!--  Row 1 -->
+          <div class="row">            
+
+            <div class="col-lg-8 d-flex align-items-stretch">
+              <div class="card w-100">
+                <div class="card-body">
+                  <div class="d-sm-flex d-block align-items-center justify-content-between mb-9">
+                    <div class="mb-3 mb-sm-0">
+                      <h5 class="card-title fw-semibold">Sindh Cities Map</h5>
+                    </div>
+                    <div>
+                      <!-- Dropdown for Sindh Cities -->
+                      <select class="form-select" id="citySelect">
+                        <option value="">Show All Sindh</option>
+                        <option value="Karachi">Karachi</option>
+                        <option value="Hyderabad">Hyderabad</option>
+                        <option value="Sukkur">Sukkur</option>
+                        <option value="Larkana">Larkana</option>
+                        <option value="Mirpur Khas">Mirpur Khas</option>
+                        <!-- Add more cities as needed -->
+                      </select>
+                    </div>
+                  </div>
+                  <!-- Map container -->
+                  <div id="map"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Leaflet Map Script -->
+            <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+            <script>
+              // Initialize the map centered on Sindh
+              var map = L.map('map').setView([25.8943, 68.5247], 7); // Centered on Sindh
+
+              // Add the tile layer (OpenStreetMap)
+              L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              }).addTo(map);
+
+              // Data for cities and their markers
+              const cityData = {
+                "Karachi": [
+                  [24.8607, 67.0011, "Karachi Marker 1"],
+                  [24.8800, 67.0500, "Karachi Marker 2"],
+                  [24.9000, 67.0200, "Karachi Marker 3"],
+                  [24.8700, 67.0100, "Karachi Marker 4"],
+                  [24.8900, 67.0300, "Karachi Marker 5"]
+                ],
+                "Hyderabad": [
+                  [25.3792, 68.3683, "Hyderabad Marker 1"],
+                  [25.3900, 68.3700, "Hyderabad Marker 2"],
+                  [25.4000, 68.3800, "Hyderabad Marker 3"],
+                  [25.3700, 68.3600, "Hyderabad Marker 4"],
+                  [25.3800, 68.3650, "Hyderabad Marker 5"]
+                ],
+                "Sukkur": [
+                  [27.7000, 68.8667, "Sukkur Marker 1"],
+                  [27.7100, 68.8700, "Sukkur Marker 2"],
+                  [27.7200, 68.8800, "Sukkur Marker 3"],
+                  [27.6900, 68.8600, "Sukkur Marker 4"],
+                  [27.7050, 68.8650, "Sukkur Marker 5"]
+                ],
+                "Larkana": [
+                  [27.5600, 68.2100, "Larkana Marker 1"],
+                  [27.5700, 68.2200, "Larkana Marker 2"],
+                  [27.5800, 68.2300, "Larkana Marker 3"],
+                  [27.5500, 68.2000, "Larkana Marker 4"],
+                  [27.5650, 68.2150, "Larkana Marker 5"]
+                ],
+                "Mirpur Khas": [
+                  [25.5250, 69.0150, "Mirpur Khas Marker 1"],
+                  [25.5300, 69.0200, "Mirpur Khas Marker 2"],
+                  [25.5400, 69.0300, "Mirpur Khas Marker 3"],
+                  [25.5200, 69.0100, "Mirpur Khas Marker 4"],
+                  [25.5350, 69.0250, "Mirpur Khas Marker 5"]
+                ]
+              };
+
+              // Function to add markers to the map
+              function addMarkers(markers) {
+                markers.forEach(([lat, lng, title]) => {
+                  L.marker([lat, lng]).addTo(map)
+                    .bindPopup(`<b>${title}</b><br>Coordinates: ${lat.toFixed(4)}, ${lng.toFixed(4)}`);
+                });
+              }
+
+              // Function to clear all markers
+              function clearMarkers() {
+                map.eachLayer(layer => {
+                  if (layer instanceof L.Marker) {
+                    map.removeLayer(layer);
+                  }
+                });
+              }
+
+              // Show all Sindh markers by default
+              const allMarkers = Object.values(cityData).flat();
+              addMarkers(allMarkers);
+
+              // Event listener for city selection
+              document.getElementById('citySelect').addEventListener('change', function (event) {
+                const selectedCity = event.target.value;
+
+                // Clear all existing markers
+                clearMarkers();
+
+                if (selectedCity) {
+                  // Show markers for the selected city
+                  const cityMarkers = cityData[selectedCity];
+                  addMarkers(cityMarkers);
+
+                  // Center the map on the selected city
+                  const [lat, lng] = cityMarkers[0]; // Use the first marker's coordinates
+                  map.setView([lat, lng], 12); // Zoom level 12 for a closer view
+                } else {
+                  // Show all Sindh markers
+                  addMarkers(allMarkers);
+                  map.setView([25.8943, 68.5247], 7); // Reset to Sindh view
+                }
+              });
+
+              // Ensure the map resizes correctly
+              setTimeout(function () {
+                map.invalidateSize();
+              }, 0);
+            </script>
+
+            <div class="col-lg-4">
+              <div class="row">
+                <div class="col-lg-12">
+                  <!-- Yearly Breakup -->
+                  <div class="card overflow-hidden">
+                    <div class="card-body p-4">
+                      <h5 class="card-title mb-9 fw-semibold">Yearly Registration Breakup</h5>
+                      <div class="row align-items-center">
+                        <div class="col-7">
+                          <h4 class="fw-semibold mb-3">36,358</h4>
+                          <div class="d-flex align-items-center mb-3">
+                            <span
+                              class="me-1 rounded-circle bg-light-success round-20 d-flex align-items-center justify-content-center">
+                              <i class="ti ti-arrow-up-left text-success"></i>
+                            </span>
+                            <p class="text-dark me-1 fs-3 mb-0">+9%</p>
+                            <p class="fs-3 mb-0">last year</p>
+                          </div>
+                          <div class="d-flex align-items-center">
+                            <div class="me-4">
+                              <span class="round-8 bg-primary rounded-circle me-2 d-inline-block"></span>
+                              <span class="fs-2">2025</span>
+                            </div>
+                            <div>
+                              <span class="round-8 bg-light-primary rounded-circle me-2 d-inline-block"></span>
+                              <span class="fs-2">2024</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-5">
+                          <div class="d-flex justify-content-center">
+                            <div id="breakup"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-12">
+                  <!-- Monthly Earnings -->
+                  <div class="card">
+                    <div class="card-body">
+                      <div class="row alig n-items-start">
+                        <div class="col-8">
+                          <h5 class="card-title mb-9 fw-semibold"> Monthly Regirstation </h5>
+                          <h4 class="fw-semibold mb-3">6,820</h4>
+                          <div class="d-flex align-items-center pb-1">
+                            <span
+                              class="me-2 rounded-circle bg-light-danger round-20 d-flex align-items-center justify-content-center">
+                              <i class="ti ti-arrow-down-right text-danger"></i>
+                            </span>
+                            <p class="text-dark me-1 fs-3 mb-0">+9%</p>
+                            <p class="fs-3 mb-0">last year</p>
+                          </div>
+                        </div>
+                        <div class="col-4">
+                          <div class="d-flex justify-content-end">
+                            <div
+                              class="text-white bg-secondary rounded-circle p-6 d-flex align-items-center justify-content-center">
+                              <i class="ti ti-currency-dollar fs-6"></i>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div id="earning"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+
+          <div class="py-6 px-6 text-center">
+            <p class="mb-0 fs-4">Developed in: <a href="https://adminmart.com/" target="_blank"
+                class="pe-1 text-primary text-decoration-underline">March 2025</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
+  <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/sidebarmenu.js"></script>
+  <script src="../assets/js/app.min.js"></script>
+  <script src="../assets/libs/apexcharts/dist/apexcharts.min.js"></script>
+  <script src="../assets/libs/simplebar/dist/simplebar.js"></script>
+  <script src="../assets/js/dashboard.js"></script>
+  <!-- solar icons -->
+  <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
+</body>
+
+</html>
