@@ -31,24 +31,60 @@
 //   );
 // }
 
+
 "use client"; // Mark this component as a Client Component
 
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Script from 'next/script';
-// import Head from 'next/head';
+import { auth, signInWithEmailAndPassword } from '../app/lib/firebase-config'; // Import Firebase auth functions
+import { useRouter, usePathname } from 'next/navigation'; // Use next/navigation for routing
 
 export default function LoginPage() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const router = useRouter(); // Initialize the router
+  const pathname = usePathname(); // Get the current pathname
+
+  // Redirect logic based on authentication status
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        router.push('/dashboard'); // Redirect to dashboard if user is logged in
+      } else if (pathname !== '/') {
+        router.push('/'); // Redirect to login page if user is not logged in and trying to access a protected page
+      }
+    });
+
+    return () => unsubscribe(); // Cleanup the listener on unmount
+  }, [router, pathname]);
+
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    try {
+      // Sign in with email and password
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      console.log('User signed in:', user);
+      alert('Sign in successful!');
+
+      // Redirect to the dashboard
+      router.push('/dashboard');
+    } catch (error:unknown) {
+     
+      setError(String(error));
+
+      console.error('Sign in error:', error);
+    }
+  };
+
   return (
     <>
-      {/* Meta Tags */}
-      {/* <Head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Modernize Free Bootstrap Admin Template by Adminmart</title>
-        <link rel="shortcut icon" type="image/png" href="/assets/images/logos/favicon.png" />
-      </Head> */}
-
       {/* Body Wrapper */}
       <div
         className="page-wrapper"
@@ -75,16 +111,19 @@ export default function LoginPage() {
                       />
                     </Link>
                     <p className="text-center">Your Social Campaigns</p>
-                    <form>
+                    <form onSubmit={handleSignIn}>
                       <div className="mb-3">
                         <label htmlFor="exampleInputEmail1" className="form-label">
-                          Username
+                          Email Address
                         </label>
                         <input
                           type="email"
                           className="form-control"
                           id="exampleInputEmail1"
                           aria-describedby="emailHelp"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          required
                         />
                       </div>
                       <div className="mb-4">
@@ -95,8 +134,12 @@ export default function LoginPage() {
                           type="password"
                           className="form-control"
                           id="exampleInputPassword1"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          required
                         />
                       </div>
+                      {error && <div className="alert alert-danger">{error}</div>}
                       <div className="d-flex align-items-center justify-content-between mb-4">
                         <div className="form-check">
                           <input
@@ -113,12 +156,9 @@ export default function LoginPage() {
                           Forgot Password ?
                         </Link>
                       </div>
-                      <Link
-                        href="/dashboard"
-                        className="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2"
-                      >
+                      <button type="submit" className="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">
                         Sign In
-                      </Link>
+                      </button>
                       <div className="d-flex align-items-center justify-content-center">
                         <p className="fs-4 mb-0 fw-bold">New to Modernize?</p>
                         <Link href="/register" className="text-primary fw-bold ms-2">

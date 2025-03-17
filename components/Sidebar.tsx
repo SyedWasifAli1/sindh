@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -7,8 +9,25 @@ import {
   FaPencilAlt,
   FaSignOutAlt,
 } from "react-icons/fa";
+import { signOut } from "firebase/auth";
+import { auth } from '../app/lib/firebase-config';
+import { useRouter } from "next/navigation";
+
 
 export default function Sidebar() {
+
+
+    const router = useRouter(); 
+  const handleLogout = async () => {
+    try {
+      await signOut(auth); // Sign out the user from Firebases
+      alert('You have been logged out!');
+      router.push('/'); // Redirect to login page (or wherever you want to redirect the user)
+    } catch (error) {
+      console.error('Error signing out:', error);
+      alert('Failed to sign out. Please try again.');
+    }
+  };
   return (
     <aside className="left-sidebar">
       <div>
@@ -66,13 +85,19 @@ export default function Sidebar() {
               </Link>
             </li>
             <li className="sidebar-item">
-              <Link className="sidebar-link" href="/">
-                <FaSignOutAlt className="me-2" />
-                <span className="hide-menu">Signout</span>
+              <Link className="sidebar-link" href="/dashboard/licensed">
+                <FaPencilAlt className="me-2" />
+                <span className="hide-menu">licensed</span>
               </Link>
             </li>
+            <li className="sidebar-item">
+              <button className="sidebar-link-button"  onClick={handleLogout}>
+                <FaSignOutAlt className="me-2" />
+                <span className="hide-menu">Signout</span>
+              </button>
+            </li>
           </ul>
-          <div className="unlimited-access hide-menu bg-light-secondary position-relative mb-7 mt-5 rounded">
+          {/* <div className="unlimited-access hide-menu bg-light-secondary position-relative mb-7 mt-5 rounded">
             <div className="d-flex">
               <div className="unlimited-access-title me-3">
                 <h6 className="fw-semibold fs-4 mb-6 text-dark w-85">
@@ -96,7 +121,7 @@ export default function Sidebar() {
                 />
               </div>
             </div>
-          </div>
+          </div> */}
         </nav>
       </div>
     </aside>

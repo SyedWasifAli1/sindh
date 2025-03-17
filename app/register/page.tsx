@@ -3,40 +3,48 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import Head from 'next/head';
-// import { auth, createUserWithEmailAndPassword } from '../../lib/firebase'; // Uncomment if using Firebase
+import { auth, createUserWithEmailAndPassword } from '../lib/firebase-config'; // Import Firebase auth
+import { doc, setDoc, getFirestore } from 'firebase/firestore'; // Import Firestore functions
+import { useRouter } from 'next/navigation';
+
 
 export default function RegisterPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  // const [error, setError] = useState(''); // Uncomment if using Firebase
+  const [error, setError] = useState('');
+  const router = useRouter();
 
-  // const handleRegister = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   setError('');
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
 
-  //   try {
-  //     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-  //     console.log('User registered:', userCredential.user);
-  //     alert('Registration successful!');
-  //   } catch (error) {
-  //     setError(error.message);
-  //     console.error('Registration error:', error);
-  //   }
-  // };
+    try {
+      // Create user with email and password
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Save user data to Firestore
+      const db = getFirestore();
+      await setDoc(doc(db, 'users', user.uid), {
+        name: name,
+        email: email,
+        createdAt: new Date().toISOString(),
+        uid: user.uid,
+      });
+
+      console.log('User registered and data saved:', user);
+      alert('Registration successful!');
+      router.push('/dashboard');
+    } catch (error:unknown) {
+      setError(String(error));
+      console.error('Registration error:', error);
+    }
+  };
 
   return (
     <>
       {/* Meta Tags */}
-      <Head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Modernize Free Bootstrap Admin Template by Adminmart</title>
-        <link rel="shortcut icon" type="image/png" href="/assets/images/logos/favicon.png" />
-      </Head>
-
-      {/* Body Wrapper */}
       <div
         className="page-wrapper"
         id="main-wrapper"
@@ -62,7 +70,7 @@ export default function RegisterPage() {
                       />
                     </Link>
                     <p className="text-center">Your Social Campaigns</p>
-                    <form>
+                    <form onSubmit={handleRegister}>
                       <div className="mb-3">
                         <label htmlFor="exampleInputtext1" className="form-label">
                           Name
@@ -104,7 +112,7 @@ export default function RegisterPage() {
                           required
                         />
                       </div>
-                      {/* {error && <div className="alert alert-danger">{error}</div>} */}
+                      {error && <div className="alert alert-danger">{error}</div>}
                       <button type="submit" className="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">
                         Sign Up
                       </button>
