@@ -158,6 +158,7 @@ import React, { useState, useEffect } from 'react';
 import { firestore, collection, getDocs, doc, updateDoc } from '../app/lib/firebase-config'; // Import updateDoc
 
 const FacilityCard = () => {
+  const [city, setCity] = useState([]); // Combined facilities data
   const [facilities, setFacilities] = useState([]); // Combined facilities data
   const [filteredFacilities, setFilteredFacilities] = useState([]); // Filtered facilities
   const [showModal, setShowModal] = useState(false); // Modal control
@@ -193,6 +194,7 @@ const FacilityCard = () => {
         });
 
         setFacilities(combinedData);
+        setCity(locationsData);
         setFilteredFacilities(combinedData);
         setLoading(false);
       } catch (error) {
@@ -221,7 +223,7 @@ const FacilityCard = () => {
     const filtered = facilities.filter(facility => {
       const matchesCity = cityFilter ? facility.city.toLowerCase() === cityFilter : true;
       const matchesStatus = statusFilter ? facility.status === statusFilter : true;
-      const matchesSearch = searchQuery ? facility.facility.toLowerCase().includes(searchQuery) : true;
+      const matchesSearch = searchQuery ? facility.privateowner.toLowerCase().includes(searchQuery) : true;
 
       return matchesCity && matchesStatus && matchesSearch;
     });
@@ -269,14 +271,24 @@ const FacilityCard = () => {
         <div className="row mb-4">
           <div className="col-md-4">
             <label htmlFor="cityFilter" className="form-label">Filter by City</label>
-            <select className="form-select" id="cityFilter" onChange={filterFacilities}>
-              <option value="">All Cities</option>
-              <option value="Karachi">Karachi</option>
-              <option value="Hyderabad">Hyderabad</option>
-              <option value="Sukkur">Sukkur</option>
-              <option value="Larkana">Larkana</option>
-              <option value="Mirpur Khas">Mirpur Khas</option>
-            </select>
+            {/* <select className="form-select" id="cityFilter" onChange={filterFacilities}>
+  <option value="">All Cities</option>
+  {city.map((city, index) => (
+    <option key={index} value={city.city}>
+      {city.city}
+    </option>
+  ))}
+</select> */}
+
+<select className="form-select" id="cityFilter" onChange={filterFacilities}>
+  <option value="">All Cities</option>
+  {Array.from(new Set(city.map((city) => city.city)))
+    .map((city, index) => (
+      <option key={index} value={city}>
+        {city}
+      </option>
+    ))}
+</select>x
           </div>
           <div className="col-md-4">
             <label htmlFor="statusFilter" className="form-label">Filter by Status</label>
