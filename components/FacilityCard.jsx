@@ -288,7 +288,7 @@ const FacilityCard = () => {
         {city}
       </option>
     ))}
-</select>x
+</select>
           </div>
           <div className="col-md-4">
             <label htmlFor="statusFilter" className="form-label">Filter by Status</label>
