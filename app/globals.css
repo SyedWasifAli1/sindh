@@ -59,6 +59,12 @@ a {
   font-size: 12px;
   font-weight: 500;
 }
+.leaflet-control-attribution {
+  display: none !important;
+}
+/* .custom-map .leaflet-control-attribution {
+  display: none !important;
+} */
 
 .status-badge.licensed {
   background: #e7f0b6;
