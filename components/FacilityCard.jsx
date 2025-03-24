@@ -1,195 +1,307 @@
-// import React, { useState } from 'react';
+// import React, { useState, useEffect } from 'react';
+// import { firestore, collection, doc, updateDoc, onSnapshot } from '../app/lib/firebase-config';
 
 // const FacilityCard = () => {
-//   const [facilities, setFacilities] = useState([
-//     { name: "ABC Hospital", city: "Karachi", status: "registered" },
-//     { name: "XYZ Clinic", city: "Hyderabad", status: "unregistered" },
-//     { name: "PQR Diagnostic Center", city: "Sukkur", status: "rejected" },
-//     { name: "LMN Pharmacy", city: "Larkana", status: "registered" },
-//     { name: "EFG Lab", city: "Mirpur Khas", status: "unregistered" },
-//     { name: "RST Medical Center", city: "Karachi", status: "registered" },
-//   ]);
+//   const [city, setCity] = useState([]); // Combined facilities data
+//   const [facilities, setFacilities] = useState([]); // Combined facilities data
+//   const [filteredFacilities, setFilteredFacilities] = useState([]); // Filtered facilities
+//   const [showDetailsModal, setShowDetailsModal] = useState(false); // Details modal control
+//   const [loading, setLoading] = useState(true); // Loading state
+//   const [selectedFacility, setSelectedFacility] = useState(null); // Track selected facility for details
 
-//   const questions = [
-//     { question: "What is the facility's primary service?", answer: "General healthcare services." },
-//     { question: "How many staff members are employed?", answer: "25 staff members." },
-//     { question: "Is the facility operational 24/7?", answer: "Yes, the facility operates 24/7." },
-//     { question: "What types of medical equipment are available?", answer: "X-ray machines, ultrasound, and lab equipment." },
-//     { question: "Does the facility have an emergency department?", answer: "Yes, it has a fully equipped emergency department." },
-//     // Add more questions as needed
-//   ];
-
-//   const [filteredFacilities, setFilteredFacilities] = useState(facilities);
-//   const [showModal, setShowModal] = useState(false); // State to control modal visibility
+//   // Real-time data fetching using onSnapshot
+//   useEffect(() => {
+//     const facilitiesRef = collection(firestore, 'facility_selections');
+  
+//     // Listen for changes in facility_selections
+//     const unsubscribeFacilities = onSnapshot(facilitiesRef, (facilitiesSnapshot) => {
+//       const facilitiesData = facilitiesSnapshot.docs.map((doc) => ({
+//         id: doc.id, // Document ID
+//         ...doc.data(), // Document data
+//       })) ;
+  
+//       // Extract unique cities from facilitiesData
+//       const uniqueCities = Array.from(
+//         new Set(facilitiesData.map((facility) => facility.cityName))
+//       ).map((city) => ({ id: city, city })); // Create an array of unique cities
+  
+//       // Set facilities and unique cities
+//       setFacilities(facilitiesData);
+//       setCity(uniqueCities); // Set unique cities
+//       setFilteredFacilities(facilitiesData); // Initialize filtered facilities
+//       setLoading(false);
+//     });
+  
+//     // Cleanup facility listener
+//     return () => unsubscribeFacilities();
+//   }, []);
 
 //   const filterFacilities = () => {
 //     const cityFilter = document.getElementById("cityFilter").value.toLowerCase();
 //     const statusFilter = document.getElementById("statusFilter").value.toLowerCase();
 //     const searchQuery = document.getElementById("searchFacility").value.toLowerCase();
-
+  
 //     const filtered = facilities.filter(facility => {
-//       const matchesCity = cityFilter ? facility.city.toLowerCase() === cityFilter : true;
-//       const matchesStatus = statusFilter ? facility.status === statusFilter : true;
-//       const matchesSearch = searchQuery ? facility.name.toLowerCase().includes(searchQuery) : true;
-
+//       // Safeguard against undefined fields
+//       const facilityCity = facility.cityName ? facility.cityName.toLowerCase() : '';
+//       const facilityStatus = facility.status ? facility.status.toLowerCase() : '';
+//       const facilityOwner = facility.privateOwner ? facility.privateOwner.toLowerCase() : '';
+//       const facilityClinicName = facility.clinicName ? facility.clinicName.toLowerCase() : '';
+  
+//       const matchesCity = cityFilter ? facilityCity === cityFilter : true;
+//       const matchesStatus = statusFilter ? facilityStatus === statusFilter : true;
+//       const matchesSearch = searchQuery ? 
+//         facilityOwner.includes(searchQuery) || 
+//         facilityClinicName.includes(searchQuery) : true;
+  
 //       return matchesCity && matchesStatus && matchesSearch;
 //     });
-
+  
 //     setFilteredFacilities(filtered);
 //   };
 
-//   const updateFacilityStatus = (facilityName, newStatus) => {
-//     const updatedFacilities = facilities.map(facility => {
-//       if (facility.name === facilityName) {
-//         return { ...facility, status: newStatus };
-//       }
-//       return facility;
-//     });
-//     setFacilities(updatedFacilities);
-//     filterFacilities();
+//   const updateFacilityStatus = async (facilityId, newStatus) => {
+//     try {
+//       // Update status in Firestore
+//       const facilityRef = doc(firestore, 'facility_selections', facilityId);
+//       await updateDoc(facilityRef, { status: newStatus });
+
+//       // No need to update local state manually; onSnapshot will handle it
+//     } catch (error) {
+//       console.error("Error updating facility status: ", error);
+//     }
 //   };
 
-//   const handleShowModal = () => {
-//     setShowModal(true); // Open the modal
+//   const handleShowDetailsModal = (facility) => {
+//     setSelectedFacility(facility); // Set the selected facility
+//     setShowDetailsModal(true); // Open details modal
 //   };
 
-//   const handleCloseModal = () => {
-//     setShowModal(false); // Close the modal
+//   const handleCloseModals = () => {
+//     setShowDetailsModal(false); // Close details modal
+//     setSelectedFacility(null); // Reset selected facility
 //   };
+
+//   if (loading) {
+//     return <div>Loading facilities...</div>; // Loading state
+//   }
 
 //   return (
 //     <>
-    
-    
-//     <div className="facility-card">
-//       <h5 className="card-title fw-semibold">List of Facilities</h5>
-//       <div className="row mb-4">
-//         <div className="col-md-4">
-//           <label htmlFor="cityFilter" className="form-label">Filter by City</label>
-//           <select className="form-select" id="cityFilter" onChange={filterFacilities}>
-//             <option value="">All Cities</option>
-//             <option value="Karachi">Karachi</option>
-//             <option value="Hyderabad">Hyderabad</option>
-//             <option value="Sukkur">Sukkur</option>
-//             <option value="Larkana">Larkana</option>
-//             <option value="Mirpur Khas">Mirpur Khas</option>
-//           </select>
+//       <div className="facility-card">
+//         <h5 className="card-title fw-semibold">List of Facilities</h5>
+//         <div className="row mb-4">
+//           <div className="col-md-4">
+//             <label htmlFor="cityFilter" className="form-label">Filter by City</label>
+//             <select className="form-select" id="cityFilter" onChange={filterFacilities}>
+//               <option value="">All Cities</option>
+//               {Array.from(new Set(city.map((city) => city.city)))
+//                 .map((city, index) => (
+//                   <option key={index} value={city}>
+//                     {city}
+//                   </option>
+//                 ))}
+//             </select>
+//           </div>
+//           <div className="col-md-4">
+//             <label htmlFor="statusFilter" className="form-label">Filter by Status</label>
+//             <select className="form-select" id="statusFilter" onChange={filterFacilities}>
+//               <option value="">All Statuses</option>
+//               <option value="Pending">Pending</option>
+//                       <option value="Registered">Registered</option>
+//                       <option value="UnRegistered">UnRegistered</option>
+//                       <option value="Licensed">Licensed</option>
+//             </select>
+//           </div>
+//           <div className="col-md-4">
+//             <label htmlFor="searchFacility" className="form-label">Search Facility</label>
+//             <input type="text" className="form-control" id="searchFacility" placeholder="Enter facility name" onChange={filterFacilities} />
+        
+//           </div>
 //         </div>
-//         <div className="col-md-4">
-//           <label htmlFor="statusFilter" className="form-label">Filter by Status</label>
-//           <select className="form-select" id="statusFilter" onChange={filterFacilities}>
-//             <option value="">All Statuses</option>
-//             <option value="registered">Registered</option>
-//             <option value="unregistered">Unregistered</option>
-//             <option value="rejected">Rejected</option>
-//           </select>
-//         </div>
-//         <div className="col-md-4">
-//           <label htmlFor="searchFacility" className="form-label">Search Facility</label>
-//           <input type="text" className="form-control" id="searchFacility" placeholder="Enter facility name" onChange={filterFacilities} />
-//         </div>
-//       </div>
-//       <div className="table-responsive">
-//         <table className="table table-striped">
-//           <thead>
-//             <tr>
-//               <th>Facility Name</th>
-//               <th>City</th>
-//               <th>Status</th>
-//               <th>Actions</th>
-//             </tr>
-//           </thead>
-//           <tbody id="facilityTable">
-//             {filteredFacilities.map((facility, index) => (
-//               <tr key={index}>
-//                 <td>{facility.name}</td>
-//                 <td>{facility.city}</td>
-//                 <td>
-//                   <select className="form-select status-select" value={facility.status} onChange={(e) => updateFacilityStatus(facility.name, e.target.value)}>
-//                     <option value="registered">Registered</option>
-//                     <option value="unregistered">Unregistered</option>
-//                     <option value="rejected">Rejected</option>
-//                   </select>
-//                 </td>
-//                 <td>
-//                   <button className="btn btn-sm btn-primary">Edit</button>
-//                   <button className="btn btn-sm btn-danger">Delete</button>
-//                   <button className="btn btn-sm btn-info" onClick={handleShowModal}>Show Questioning</button>
-//                 </td>
+//         <div className="table-responsive">
+//           <table className="table table-striped">
+//             <thead>
+//               <tr>
+//                 <th>Facility Name</th>
+//                 <th>Facility Type</th>
+//                 <th>City</th>
+//                 <th>Status</th>
+//                 <th>Actions</th>
 //               </tr>
-//             ))}
-//           </tbody>
-//         </table>
-//       </div>
+//             </thead>
+//             <tbody id="facilityTable">
+//               {filteredFacilities.map((facility, index) => (
+//                 <tr key={index}>
+//                   <td>{facility.privateOwner}</td>
+//                   <td>{facility.clinictype}</td>
+//                   <td>{facility.cityName}</td>
+//                   <td>
+//                     <select
+//                       className="form-select status-select"
+//                       value={facility.status}
+//                       onChange={(e) => updateFacilityStatus(facility.id, e.target.value)}
+//                     >
+//                       <option value="Pending">Pending</option>
+//                       <option value="Registered">Registered</option>
+//                       <option value="UnRegistered">UnRegistered</option>
+//                       <option value="Licensed">Licensed</option>
+//                     </select>
+//                   </td>
+//                   <td>
+//                     <button className="btn btn-sm btn-primary">Edit</button>
+//                     <button className="btn btn-sm btn-danger">Delete</button>
+//                     <button className="btn btn-sm btn-info" onClick={() => handleShowDetailsModal(facility)}>Show Questing</button>
+//                   </td>
+//                 </tr>
+//               ))}
+//             </tbody>
+//           </table>
+//         </div>
 
-//       {/* Modal */}
-//       {showModal && (
-//         <div className="modal fade show" tabIndex="-1" style={{ display: 'block' }}>
-//           <div className="modal-dialog modal-lg">
-//             <div className="modal-content">
-//               <div className="modal-header">
-//                 <h5 className="modal-title">Facility Questioning</h5>
-//                 <button type="button" className="btn-close" onClick={handleCloseModal}></button>
-//               </div>
-//               <div className="modal-body">
-//                 <div id="questioningContent">
-//                   {questions.map((q, index) => (
-//                     <div className="question-item" key={index}>
-//                       <strong>Q{index + 1}: {q.question}</strong>
-//                       <p>A: {q.answer}</p>
-//                     </div>
-//                   ))}
+//         {/* Details Modal */}
+//         {showDetailsModal && (
+//           <div className="modal fade show" tabIndex="-1" style={{ display: 'block', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+//             <div className="modal-dialog modal-lg">
+//               <div className="modal-content">
+//                 <div className="modal-header">
+//                   <h5 className="modal-title">Facility Details - {selectedFacility?.privateowner}</h5>
+//                   <button type="button" className="btn-close" onClick={handleCloseModals}></button>
 //                 </div>
-//               </div>
-//               <div className="modal-footer">
-//                 <button type="button" className="btn btn-secondary" onClick={handleCloseModal}>Close</button>
+//                 <div className="modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+//                   <div id="detailsContent">
+//                     {selectedFacility && (
+//                       <div>
+//                         {/* General Facility Details */}
+//                         <p><strong>Q1: What services are you providing at this facility?</strong><br /> * {selectedFacility.clinicname}</p>
+//                         <p><strong>Q2: SHCC Assigned Category?</strong> <br /> * {selectedFacility.clinictype}</p>
+//                         <p><strong>Q3: Who owns the facility?</strong> <br /> * {selectedFacility.ownership} <br /> * {selectedFacility.privateowner}</p>
+//                         <p><strong>Q4: Who manages the Facility?</strong><br /> * {selectedFacility.managername} <br /> * {selectedFacility.managerdesignation} <br /> * {selectedFacility.managementtype}</p>
+//                         <p><strong>Q5: What is the service level category?</strong> <br /> * {selectedFacility.servicelevel}</p>
+//                         <p>
+//                           <strong>Q6: What is the operational level category?</strong> <br />
+//                           {[
+//                             selectedFacility.outpatient ? "Out Patient" : null,
+//                             selectedFacility.ambulatorycare ? "Ambulatory Care" : null,
+//                             selectedFacility.inpatient ? "In-Patient" : null,
+//                             selectedFacility.ehabilitation ? "Rehabilitation" : null,
+//                             selectedFacility.diagnostics ? "Diagnostics" : null,
+//                             selectedFacility.alloftheabove ? "All of the above" : null,
+//                           ]
+//                             .filter(Boolean) // Remove null/empty values
+//                             .join(", ")} {/* Join non-empty values with a comma */}
+//                         </p>
+
+//                         {/* Table for Inpatient and Ambulatory Beds */}
+//                         <div className="table-responsive">
+//                           <table className="table table-bordered table-striped">
+//                             <thead>
+//                               <tr>
+//                                 <th>Beds</th>
+//                                 <th>Inpatient {selectedFacility.inpatient ? "(Yes)" : "(No)"}</th>
+//                                 <th>Ambulatory {selectedFacility.ambulatorycare ? "(Yes)" : "(No)"}</th>
+//                               </tr>
+//                             </thead>
+//                             <tbody>
+//                               <tr>
+//                                 <td>ER Beds</td>
+//                                 <td>{selectedFacility.inPatienterBeds}</td>
+//                                 <td>{selectedFacility.ambulatoryerBeds}</td>
+//                               </tr>
+//                               <tr>
+//                                 <td>Holding Beds</td>
+//                                 <td>{selectedFacility.inPatientholdingBeds}</td>
+//                                 <td>{selectedFacility.ambulatoryholdingBeds}</td>
+//                               </tr>
+//                               <tr>
+//                                 <td>ICU Beds</td>
+//                                 <td>{selectedFacility.inPatienticuBeds}</td>
+//                                 <td>{selectedFacility.ambulatoryicuBeds}</td>
+//                               </tr>
+//                               <tr>
+//                                 <td>NICU Beds</td>
+//                                 <td>{selectedFacility.inPatientnicuBeds}</td>
+//                                 <td>{selectedFacility.ambulatorynicuBeds}</td>
+//                               </tr>
+//                               <tr>
+//                                 <td>PICU Beds</td>
+//                                 <td>{selectedFacility.inPatientpicuBeds}</td>
+//                                 <td>{selectedFacility.ambulatorypicuBeds}</td>
+//                               </tr>
+//                               <tr>
+//                                 <td>Private Beds</td>
+//                                 <td>{selectedFacility.inPatientprivateBeds}</td>
+//                                 <td>{selectedFacility.ambulatoryprivateBeds}</td>
+//                               </tr>
+//                               <tr>
+//                                 <td>Semi-General Beds</td>
+//                                 <td>{selectedFacility.inPatientsemiGeneralBeds}</td>
+//                                 <td>{selectedFacility.ambulatorysemiGeneralBeds}</td>
+//                               </tr>
+//                               <tr>
+//                                 <td>Specialized Care Beds</td>
+//                                 <td>{selectedFacility.inPatientspecializedCareBeds}</td>
+//                                 <td>{selectedFacility.ambulatoryspecializedCareBeds}</td>
+//                               </tr>
+//                             </tbody>
+//                           </table>
+//                         </div>
+//                       </div>
+//                     )}
+//                   </div>
+//                 </div>
+//                 <div className="modal-footer">
+//                   <button type="button" className="btn btn-secondary" onClick={handleCloseModals}>Close</button>
+//                 </div>
 //               </div>
 //             </div>
 //           </div>
-//         </div>
-//       )}
-//     </div>
+//         )}
+//       </div>
 //     </>
 //   );
 // };
 
 // export default FacilityCard;
 
+
 import React, { useState, useEffect } from 'react';
 import { firestore, collection, doc, updateDoc, onSnapshot } from '../app/lib/firebase-config';
 
 const FacilityCard = () => {
-  const [city, setCity] = useState([]); // Combined facilities data
-  const [facilities, setFacilities] = useState([]); // Combined facilities data
-  const [filteredFacilities, setFilteredFacilities] = useState([]); // Filtered facilities
-  const [showDetailsModal, setShowDetailsModal] = useState(false); // Details modal control
-  const [loading, setLoading] = useState(true); // Loading state
-  const [selectedFacility, setSelectedFacility] = useState(null); // Track selected facility for details
+  const [city, setCity] = useState([]);
+  const [facilities, setFacilities] = useState([]);
+  const [filteredFacilities, setFilteredFacilities] = useState([]);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showLicenseModal, setShowLicenseModal] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [selectedFacility, setSelectedFacility] = useState(null);
+  const [licenseData, setLicenseData] = useState({
+    licenseName: '',
+    licenseImage: null
+  });
+  const [newStatus, setNewStatus] = useState(''); // Track the new status for confirmation
 
-  // Real-time data fetching using onSnapshot
   useEffect(() => {
     const facilitiesRef = collection(firestore, 'facility_selections');
   
-    // Listen for changes in facility_selections
     const unsubscribeFacilities = onSnapshot(facilitiesRef, (facilitiesSnapshot) => {
       const facilitiesData = facilitiesSnapshot.docs.map((doc) => ({
-        id: doc.id, // Document ID
-        ...doc.data(), // Document data
-      })) ;
+        id: doc.id,
+        ...doc.data(),
+      }));
   
-      // Extract unique cities from facilitiesData
       const uniqueCities = Array.from(
         new Set(facilitiesData.map((facility) => facility.cityName))
-      ).map((city) => ({ id: city, city })); // Create an array of unique cities
+      ).map((city) => ({ id: city, city }));
   
-      // Set facilities and unique cities
       setFacilities(facilitiesData);
-      setCity(uniqueCities); // Set unique cities
-      setFilteredFacilities(facilitiesData); // Initialize filtered facilities
+      setCity(uniqueCities);
+      setFilteredFacilities(facilitiesData);
       setLoading(false);
     });
   
-    // Cleanup facility listener
     return () => unsubscribeFacilities();
   }, []);
 
@@ -199,7 +311,6 @@ const FacilityCard = () => {
     const searchQuery = document.getElementById("searchFacility").value.toLowerCase();
   
     const filtered = facilities.filter(facility => {
-      // Safeguard against undefined fields
       const facilityCity = facility.cityName ? facility.cityName.toLowerCase() : '';
       const facilityStatus = facility.status ? facility.status.toLowerCase() : '';
       const facilityOwner = facility.privateOwner ? facility.privateOwner.toLowerCase() : '';
@@ -217,30 +328,97 @@ const FacilityCard = () => {
     setFilteredFacilities(filtered);
   };
 
-  const updateFacilityStatus = async (facilityId, newStatus) => {
-    try {
-      // Update status in Firestore
-      const facilityRef = doc(firestore, 'facility_selections', facilityId);
-      await updateDoc(facilityRef, { status: newStatus });
+  const handleStatusChange = (facilityId, currentStatus, newStatus) => {
+    const facility = facilities.find(f => f.id === facilityId);
+    setSelectedFacility(facility);
+    setNewStatus(newStatus);
+    
+    // Prevent any changes if current status is Pending
+    // if (currentStatus === 'Pending') {
+    //   alert("Pending facilities cannot be modified");
+    //   return;
+    // }
+    
+    // Prevent changing to Pending status
+    if (newStatus === 'Pending') {
+      alert("Cannot change status back to Pending");
+      return;
+    }
+  
+    if (newStatus === 'Licensed') {
+      // Show license modal
+      setShowLicenseModal(true);
+    } else if (currentStatus === 'Registered' || currentStatus === 'UnRegistered' || currentStatus === 'Pending') {
+      // Show confirmation modal for Registered/UnRegistered changes
+      setShowConfirmModal(true);
+    } else {
+      // Direct update for other cases
+      updateFacilityStatus(facilityId, newStatus);
+    }
+  };
 
-      // No need to update local state manually; onSnapshot will handle it
+  const updateFacilityStatus = async (facilityId, status, licenseData = null) => {
+    try {
+      if (!status) {
+        console.error("Status is required");
+        return;
+      }
+
+      const updateData = { status };
+      
+      if (status === 'Licensed' && licenseData) {
+        updateData.licenseName = licenseData.licenseName;
+        updateData.licenseImage = licenseData.licenseImage;
+      }
+      
+      const facilityRef = doc(firestore, 'facility_selections', facilityId);
+      await updateDoc(facilityRef, updateData);
+      
+      // Reset modals and license data
+      setShowConfirmModal(false);
+      setShowLicenseModal(false);
+      setLicenseData({
+        licenseName: '',
+        licenseImage: null
+      });
     } catch (error) {
       console.error("Error updating facility status: ", error);
     }
   };
 
+  const handleLicenseImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // Convert image to base64 string for storage
+        setLicenseData({
+          ...licenseData,
+          licenseImage: reader.result
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleShowDetailsModal = (facility) => {
-    setSelectedFacility(facility); // Set the selected facility
-    setShowDetailsModal(true); // Open details modal
+    setSelectedFacility(facility);
+    setShowDetailsModal(true);
   };
 
   const handleCloseModals = () => {
-    setShowDetailsModal(false); // Close details modal
-    setSelectedFacility(null); // Reset selected facility
+    setShowDetailsModal(false);
+    setShowConfirmModal(false);
+    setShowLicenseModal(false);
+    setSelectedFacility(null);
+    setLicenseData({
+      licenseName: '',
+      licenseImage: null
+    });
   };
 
   if (loading) {
-    return <div>Loading facilities...</div>; // Loading state
+    return <div>Loading facilities...</div>;
   }
 
   return (
@@ -265,15 +443,14 @@ const FacilityCard = () => {
             <select className="form-select" id="statusFilter" onChange={filterFacilities}>
               <option value="">All Statuses</option>
               <option value="Pending">Pending</option>
-                      <option value="Registered">Registered</option>
-                      <option value="UnRegistered">UnRegistered</option>
-                      <option value="Licensed">Licensed</option>
+              <option value="Registered">Registered</option>
+              <option value="UnRegistered">UnRegistered</option>
+              <option value="Licensed">Licensed</option>
             </select>
           </div>
           <div className="col-md-4">
             <label htmlFor="searchFacility" className="form-label">Search Facility</label>
             <input type="text" className="form-control" id="searchFacility" placeholder="Enter facility name" onChange={filterFacilities} />
-        
           </div>
         </div>
         <div className="table-responsive">
@@ -294,21 +471,30 @@ const FacilityCard = () => {
                   <td>{facility.clinictype}</td>
                   <td>{facility.cityName}</td>
                   <td>
-                    <select
-                      className="form-select status-select"
-                      value={facility.status}
-                      onChange={(e) => updateFacilityStatus(facility.id, e.target.value)}
-                    >
-                      <option value="Pending">Pending</option>
-                      <option value="Registered">Registered</option>
-                      <option value="UnRegistered">UnRegistered</option>
-                      <option value="Licensed">Licensed</option>
-                    </select>
+                  <select
+  className="form-select status-select"
+  value={facility.status}
+  onChange={(e) => {
+    handleStatusChange(facility.id, facility.status, e.target.value);
+    // Reset the select value if the change wasn't allowed
+    if (facility.status === 'Pending' || e.target.value === 'Pending') {
+      e.target.value = facility.status;
+    }
+  }}
+  data-facility-id={facility.id}
+>
+  <option value="Pending">Pending</option>
+  <option value="Registered">Registered</option>
+  <option value="UnRegistered">UnRegistered</option>
+  <option value="Licensed">Licensed</option>
+</select>
                   </td>
                   <td>
                     <button className="btn btn-sm btn-primary">Edit</button>
                     <button className="btn btn-sm btn-danger">Delete</button>
-                    <button className="btn btn-sm btn-info" onClick={() => handleShowDetailsModal(facility)}>Show Questing</button>
+                    <button className="btn btn-sm btn-info" onClick={() => handleShowDetailsModal(facility)}>
+                      Show Details
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -322,17 +508,16 @@ const FacilityCard = () => {
             <div className="modal-dialog modal-lg">
               <div className="modal-content">
                 <div className="modal-header">
-                  <h5 className="modal-title">Facility Details - {selectedFacility?.privateowner}</h5>
+                  <h5 className="modal-title">Facility Details - {selectedFacility?.privateOwner}</h5>
                   <button type="button" className="btn-close" onClick={handleCloseModals}></button>
                 </div>
                 <div className="modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
                   <div id="detailsContent">
                     {selectedFacility && (
                       <div>
-                        {/* General Facility Details */}
-                        <p><strong>Q1: What services are you providing at this facility?</strong><br /> * {selectedFacility.clinicname}</p>
+                        <p><strong>Q1: What services are you providing at this facility?</strong><br /> * {selectedFacility.clinicName}</p>
                         <p><strong>Q2: SHCC Assigned Category?</strong> <br /> * {selectedFacility.clinictype}</p>
-                        <p><strong>Q3: Who owns the facility?</strong> <br /> * {selectedFacility.ownership} <br /> * {selectedFacility.privateowner}</p>
+                        <p><strong>Q3: Who owns the facility?</strong> <br /> * {selectedFacility.ownership} <br /> * {selectedFacility.privateOwner}</p>
                         <p><strong>Q4: Who manages the Facility?</strong><br /> * {selectedFacility.managername} <br /> * {selectedFacility.managerdesignation} <br /> * {selectedFacility.managementtype}</p>
                         <p><strong>Q5: What is the service level category?</strong> <br /> * {selectedFacility.servicelevel}</p>
                         <p>
@@ -345,11 +530,10 @@ const FacilityCard = () => {
                             selectedFacility.diagnostics ? "Diagnostics" : null,
                             selectedFacility.alloftheabove ? "All of the above" : null,
                           ]
-                            .filter(Boolean) // Remove null/empty values
-                            .join(", ")} {/* Join non-empty values with a comma */}
+                            .filter(Boolean)
+                            .join(", ")}
                         </p>
 
-                        {/* Table for Inpatient and Ambulatory Beds */}
                         <div className="table-responsive">
                           <table className="table table-bordered table-striped">
                             <thead>
@@ -409,6 +593,91 @@ const FacilityCard = () => {
                 </div>
                 <div className="modal-footer">
                   <button type="button" className="btn btn-secondary" onClick={handleCloseModals}>Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Confirmation Modal */}
+        {showConfirmModal && (
+          <div className="modal fade show" tabIndex="-1" style={{ display: 'block', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+            <div className="modal-dialog">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Confirm Status Change</h5>
+                  <button type="button" className="btn-close" onClick={handleCloseModals}></button>
+                </div>
+                <div className="modal-body">
+                  <p>Are you sure you want to change the status of <strong>{selectedFacility?.privateOwner}</strong> from <strong>{selectedFacility?.status}</strong> to <strong>{newStatus}</strong>?</p>
+                </div>
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-secondary" onClick={handleCloseModals}>Cancel</button>
+                  <button 
+                    type="button" 
+                    className="btn btn-primary"
+                    onClick={() => updateFacilityStatus(selectedFacility.id, newStatus)}
+                  >
+                    Confirm
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* License Modal */}
+        {showLicenseModal && (
+          <div className="modal fade show" tabIndex="-1" style={{ display: 'block', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+            <div className="modal-dialog">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">License Information</h5>
+                  <button type="button" className="btn-close" onClick={handleCloseModals}></button>
+                </div>
+                <div className="modal-body">
+                  <div className="mb-3">
+                    <label htmlFor="licenseName" className="form-label">License Name</label>
+                    <input 
+                      type="text" 
+                      className="form-control" 
+                      id="licenseName"
+                      value={licenseData.licenseName}
+                      onChange={(e) => setLicenseData({...licenseData, licenseName: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="licenseImage" className="form-label">License Image</label>
+                    <input 
+                      type="file" 
+                      className="form-control" 
+                      id="licenseImage"
+                      accept="image/*"
+                      onChange={handleLicenseImageChange}
+                      required
+                    />
+                    {licenseData.licenseImage && (
+                      <div className="mt-2">
+                        <img 
+                          src={licenseData.licenseImage} 
+                          alt="License preview" 
+                          style={{ maxWidth: '100%', maxHeight: '200px' }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-secondary" onClick={handleCloseModals}>Cancel</button>
+                  <button 
+                    type="button" 
+                    className="btn btn-primary"
+                    onClick={() => updateFacilityStatus(selectedFacility.id, 'Licensed', licenseData)}
+                    disabled={!licenseData.licenseName || !licenseData.licenseImage}
+                  >
+                    Submit License
+                  </button>
                 </div>
               </div>
             </div>

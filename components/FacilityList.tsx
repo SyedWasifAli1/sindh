@@ -1,60 +1,59 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { firestore } from '@/app/lib/firebase-config'; // Import firestore instance
-import { collection, onSnapshot } from 'firebase/firestore'; // Import Firestore methods
+import { firestore } from '@/app/lib/firebase-config';
+import { collection, onSnapshot } from 'firebase/firestore';
+import Image from 'next/image';
 
 interface Facility {
-  id: string; // Add ID for Firestore document
+  id: string;
   privateOwner: string;
   cityName: string;
   status: string;
   date: string;
+  licenseImage?: string;
 }
 
 interface FacilityListProps {
-  status: string; // Prop to filter by status
+  status: string;
 }
 
 const FacilityList: React.FC<FacilityListProps> = ({ status }) => {
-  const [facilities, setFacilities] = useState<Facility[]>([]); // State for fetched facilities
-  const [filteredFacilities, setFilteredFacilities] = useState<Facility[]>([]); // Filtered facilities
-  const [currentPage, setCurrentPage] = useState(1); // Pagination
-  const [itemsPerPage, setItemsPerPage] = useState(5); // Items per page
-  const [cityFilter, setCityFilter] = useState(""); // City filter
-  const [searchQuery, setSearchQuery] = useState(""); // Search query
-  const [cities, setCities] = useState<string[]>([]); 
-  // Fetch facilities in real-time
+  const [facilities, setFacilities] = useState<Facility[]>([]);
+  const [filteredFacilities, setFilteredFacilities] = useState<Facility[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [cityFilter, setCityFilter] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [cities, setCities] = useState<string[]>([]);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState("");
+
   useEffect(() => {
-    const facilitiesRef = collection(firestore, 'facility_selections'); // Replace with your collection name
+    const facilitiesRef = collection(firestore, 'facility_selections');
   
-    // Listen for changes in the facilities collection
     const unsubscribe = onSnapshot(facilitiesRef, (snapshot) => {
       const facilitiesData = snapshot.docs.map((doc) => ({
-        id: doc.id, // Document ID
-        ...doc.data(), // Spread document data
+        id: doc.id,
+        ...doc.data(),
       })) as Facility[];
   
-      // Filter facilities with the specified status
       const filteredFacilities = facilitiesData.filter(
         (facility) => facility.status === status
       );
   
-      // Extract unique cities from the filtered facilities
       const uniqueCities = Array.from(
         new Set(filteredFacilities.map((facility) => facility.cityName))
       );
   
-      setFacilities(filteredFacilities); // Update facilities state
-      setFilteredFacilities(filteredFacilities); // Initialize filtered facilities
-      setCities(uniqueCities); // Update cities state with unique cities
+      setFacilities(filteredFacilities);
+      setFilteredFacilities(filteredFacilities);
+      setCities(uniqueCities);
     });
   
-    // Cleanup listener on unmount
     return () => unsubscribe();
   }, [status]);
 
-  // Apply filters whenever cityFilter or searchQuery changes
   useEffect(() => {
     const filtered = facilities.filter((facility) => {
       const matchesCity = cityFilter ? facility.cityName === cityFilter : true;
@@ -64,11 +63,10 @@ const FacilityList: React.FC<FacilityListProps> = ({ status }) => {
       return matchesCity && matchesSearch;
     });
 
-    setFilteredFacilities(filtered); // Update filtered facilities
-    setCurrentPage(1); // Reset to the first page
+    setFilteredFacilities(filtered);
+    setCurrentPage(1);
   }, [cityFilter, searchQuery, facilities]);
 
-  // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredFacilities.slice(indexOfFirstItem, indexOfLastItem);
@@ -84,6 +82,14 @@ const FacilityList: React.FC<FacilityListProps> = ({ status }) => {
     setCurrentPage(1);
   };
 
+  const handleImageClick = (imageUrl: string) => {
+    setSelectedImage(imageUrl);
+    setShowImageModal(true);
+  };
+
+  // Only show license image column if status is "Licensed"
+  const showLicenseImageColumn = status === "Licensed";
+
   return (
     <div className="body-wrapper-inner">
       <div className="container-fluid">
@@ -97,18 +103,18 @@ const FacilityList: React.FC<FacilityListProps> = ({ status }) => {
                     Filter by City
                   </label>
                   <select
-            className="form-select"
-            id="cityFilter"
-            value={cityFilter}
-            onChange={(e) => setCityFilter(e.target.value)}
-          >
-            <option value="">All Cities</option>
-            {cities.map((city) => (
-              <option key={city} value={city}>
-                {city}
-              </option>
-            ))}
-          </select>
+                    className="form-select"
+                    id="cityFilter"
+                    value={cityFilter}
+                    onChange={(e) => setCityFilter(e.target.value)}
+                  >
+                    <option value="">All Cities</option>
+                    {cities.map((city) => (
+                      <option key={city} value={city}>
+                        {city}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div className="col-md-4">
                   <label htmlFor="searchFacility" className="form-label">
@@ -147,7 +153,8 @@ const FacilityList: React.FC<FacilityListProps> = ({ status }) => {
                       <th>Facility Name</th>
                       <th>City</th>
                       <th>Status</th>
-                      <th>Date</th>
+                      {/* <th>Date</th> */}
+                      {showLicenseImageColumn && <th>License Image</th>}
                       <th>Actions</th>
                     </tr>
                   </thead>
@@ -161,7 +168,28 @@ const FacilityList: React.FC<FacilityListProps> = ({ status }) => {
                             {facility.status}
                           </span>
                         </td>
-                        <td>{facility.date}</td>
+                        {/* <td>{facility.date}</td> */}
+                        {showLicenseImageColumn && (
+                          <td>
+                            {facility.licenseImage ? (
+                              <div 
+                                className="license-image-thumbnail"
+                                onClick={() => handleImageClick(facility.licenseImage!)}
+                                style={{ cursor: 'pointer' }}
+                              >
+                                <Image
+                                  src={facility.licenseImage}
+                                  alt="License"
+                                  width={50}
+                                  height={50}
+                                  style={{ objectFit: 'cover' }}
+                                />
+                              </div>
+                            ) : (
+                              <span>No Image</span>
+                            )}
+                          </td>
+                        )}
                         <td>
                           <button className="btn btn-sm btn-primary">Edit</button>
                           <button className="btn btn-sm btn-danger">Delete</button>
@@ -186,6 +214,37 @@ const FacilityList: React.FC<FacilityListProps> = ({ status }) => {
           </div>
         </div>
       </div>
+
+      {/* Image Modal - Only shown if status is Licensed */}
+      {showLicenseImageColumn && showImageModal && (
+        <div 
+          className="modal fade show" 
+          style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.8)' }}
+          onClick={() => setShowImageModal(false)}
+        >
+          <div className="modal-dialog modal-dialog-centered modal-lg">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">License Image</h5>
+                <button 
+                  type="button" 
+                  className="btn-close" 
+                  onClick={() => setShowImageModal(false)}
+                ></button>
+              </div>
+              <div className="modal-body text-center">
+                <Image
+                  src={selectedImage}
+                  alt="License Image"
+                  width={800}
+                  height={600}
+                  style={{ maxWidth: '100%', height: 'auto' }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
