@@ -491,20 +491,22 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="py-6 px-6 text-center">
-        <p className="mb-0 fs-4">
-          Developed in:{""}
-          <a
-            href="https://adminmart.com/"
-            target="_blank"
-            className="pe-1 text-primary text-decoration-underline"
-          >
-            March 2025
-          </a>
-        </p>
+   
+        <div className="py-6 px-6 text-center">
+          <p className="mb-0 fs-4">
+            Developed in:{"syedwasifali"}
+            <a
+              href="https://adminmart.com/"
+              target="_blank"
+              className="pe-1 text-primary text-decoration-underline"
+            >
+              March 2025
+            </a>
+          </p>
+        </div>
+
       </div>
-    </div>
+    // </div>
   );
 };
 
