@@ -533,33 +533,53 @@ const Dashboard = () => {
           },
           minZoom: 7
         }}   center={SINDH_CENTER}>
-                  {filteredMarkers.map((marker) => (
-                    <Marker
-                      key={marker.id}
-                      position={{ lat: marker.latitude, lng: marker.longitude }}
-                      title={marker.cityName}
-                      icon={{
-                        url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png", // Replace with your image URL
-                        scaledSize: new google.maps.Size(40, 40), // Adjust size as needed
-                      }}
-                      onClick={() => setSelectedMarker(marker)}
-                    />
-                  ))}
-                  {selectedMarker && (
-                    <InfoWindow
-                      position={{ lat: selectedMarker.latitude, lng: selectedMarker.longitude }}
-                      onCloseClick={() => setSelectedMarker(null)}
-                    >
-                      <div>
-                        <b>{selectedMarker.clinictype}</b>
-                        <br />
-                        <b>{selectedMarker.cityName}</b>
-                        <br />
-                        <p>Status: <b>{selectedMarker.status}</b></p>
-                        <a href="">View More</a>
-                      </div>
-                    </InfoWindow>
-                  )}
+                  {filteredMarkers.map((marker) => {
+  // Marker icon को status के आधार पर सेट करें
+  let iconUrl;
+  switch(marker.status) {
+    case 'Registered':
+      iconUrl = "http://maps.google.com/mapfiles/ms/icons/green-dot.png";
+      break;
+    case 'UnRegistered':
+      iconUrl = "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
+      break;
+    case 'Licensed':
+      iconUrl = "http://maps.google.com/mapfiles/ms/icons/blue-dot.png";
+      break;
+   
+    default:
+      return null;
+  }
+
+  return (
+    <Marker
+      key={marker.id}
+      position={{ lat: marker.latitude, lng: marker.longitude }}
+      title={marker.cityName}
+      icon={{
+        url: iconUrl,
+        scaledSize: new google.maps.Size(40, 40),
+      }}
+      onClick={() => setSelectedMarker(marker)}
+    />
+  );
+})}
+
+{selectedMarker && (
+  <InfoWindow
+    position={{ lat: selectedMarker.latitude, lng: selectedMarker.longitude }}
+    onCloseClick={() => setSelectedMarker(null)}
+  >
+    <div>
+      <b>{selectedMarker.clinictype}</b>
+      <br />
+      <b>{selectedMarker.cityName}</b>
+      <br />
+      <p>Status: <b>{selectedMarker.status}</b></p>
+      <a href="">View More</a>
+    </div>
+  </InfoWindow>
+)}
                 </GoogleMap>
               </div>
             </div>
