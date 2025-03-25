@@ -539,7 +539,7 @@ const Dashboard = () => {
                       position={{ lat: marker.latitude, lng: marker.longitude }}
                       title={marker.cityName}
                       icon={{
-                        url: "/assets/images/logos/logo.png", // Replace with your image URL
+                        url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png", // Replace with your image URL
                         scaledSize: new google.maps.Size(40, 40), // Adjust size as needed
                       }}
                       onClick={() => setSelectedMarker(marker)}
@@ -551,6 +551,8 @@ const Dashboard = () => {
                       onCloseClick={() => setSelectedMarker(null)}
                     >
                       <div>
+                        <b>{selectedMarker.clinictype}</b>
+                        <br />
                         <b>{selectedMarker.cityName}</b>
                         <br />
                         <p>Status: <b>{selectedMarker.status}</b></p>
