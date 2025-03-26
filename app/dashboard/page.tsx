@@ -384,7 +384,8 @@ interface Facility {
   status: string;
   latitude: number;
   longitude: number;
-  clinictype: string; // Add clinicName to the interface
+  clinicName: string; // Add clinicName to the interface
+  clinicType: string; // Add clinicName to the interface
 }
 
 const Dashboard = () => {
@@ -409,7 +410,8 @@ const Dashboard = () => {
         status: doc.data().status,
         latitude: doc.data().latitude,
         longitude: doc.data().longitude,
-        clinictype: doc.data().clinictype, // Assuming clinicName is a field in your Firestore document
+        clinicName: doc.data().privateOwner, // Assuming clinicName is a field in your Firestore document
+        clinicType: doc.data().clinictype, // Assuming clinicName is a field in your Firestore document
       })) as Facility[];
 
       // Log fetched data for debugging
@@ -420,20 +422,32 @@ const Dashboard = () => {
 
       // Process data to get unique clinic names and their counts
       const clinicCounts = facilitiesData.reduce((acc, facility) => {
-        if (facility.clinictype) {
-          acc[facility.clinictype] = (acc[facility.clinictype] || 0) + 1;
+        if (facility.clinicType) {
+          acc[facility.clinicType] = (acc[facility.clinicType] || 0) + 1;
         }
         return acc;
       }, {} as Record<string, number>);
 
       // Convert clinicCounts to an array of objects
-      const clinicDataArray = Object.keys(clinicCounts).map((clinicName) => ({
-        title: clinicName,
-        value: clinicCounts[clinicName],
-      }));
+    // Define allowed clinic names (add the 6 names you want to show)
+const allowedClinics = [
+  "Homeopathy Clinic",
+  "TibbMatab Clinic", 
+  "GP Clinic",
+  "Poly Clinic",
+  "Single Specailty Clinic / Consultant Clinic ",
+  "Dental Clinic"
+];
 
-      // Update clinicData state
-      setClinicData(clinicDataArray);
+const clinicDataArray = 
+
+  allowedClinics.map((clinicType) => ({
+    title: clinicType,
+    value: clinicCounts[clinicType]  || 0,
+  }));
+
+// Update clinicData state
+setClinicData(clinicDataArray);
 
       // Process data to get status counts
       const statusCounts = facilitiesData.reduce((acc, facility) => {
@@ -570,8 +584,8 @@ const Dashboard = () => {
     position={{ lat: selectedMarker.latitude, lng: selectedMarker.longitude }}
     onCloseClick={() => setSelectedMarker(null)}
   >
-    <div>
-      <b>{selectedMarker.clinictype}</b>
+    <div className="mx-3">
+      <b>{selectedMarker.clinicName}</b>
       <br />
       <b>{selectedMarker.cityName}</b>
       <br />
@@ -579,8 +593,10 @@ const Dashboard = () => {
       <a href="">View More</a>
     </div>
   </InfoWindow>
+  
 )}
                 </GoogleMap>
+
               </div>
             </div>
           </div>
@@ -694,23 +710,26 @@ const Dashboard = () => {
         <div className="col-lg-12">
           <div className="row">
             {clinicData.map((card, index) => (
-              <div className="col-lg-4" key={index}>
-                <div className="card">
-                  <div className="card-body">
-                    <div className="row align-items-start">
-                      <div className="col-8">
-                        <h5 className="card-title mb-9 fw-semibold">
-                          <FaCheckCircle className="me-2" /> {card.title}
-                        </h5>
-                        <h4 className="fw-semibold mb-3">{card.value}</h4>
-                        <div className="d-flex align-items-center pb-1">
-                          <span className="me-2 rounded-circle bg-light-danger round-20 d-flex align-items-center justify-content-center">
-                            <FaArrowDown className="text-danger" />
-                          </span>
-                          <p className="text-dark me-1 fs-3 mb-0">+9%</p>
-                          <p className="fs-3 mb-0">last year</p>
-                        </div>
-                      </div>
+              <div className="col-lg-4 mb-3" key={index}> {/* Added mb-3 for spacing */}
+                <div className="card h-100"> {/* Ensure consistent height */}
+                  <div className="card-body d-flex flex-column"> {/* Flex column layout */}
+                    <div className="flex-grow-1"> {/* Allow title to grow */}
+                      <h5 
+                        className="card-title fw-semibold mb-3 text-truncate" 
+                        style={{ fontSize: "1rem" }} // Smaller font size
+                        title={card.title} // Show full title on hover
+                      >
+                        <FaCheckCircle className="me-2" /> 
+                        {card.title}
+                      </h5>
+                      <h4 className="fw-semibold mb-3">{card.value}</h4>
+                    </div>
+                    <div className="d-flex align-items-center pb-1">
+                      <span className="me-2 rounded-circle bg-light-danger round-20 d-flex align-items-center justify-content-center">
+                        <FaArrowDown className="text-danger" />
+                      </span>
+                      <p className="text-dark me-1 fs-3 mb-0">+9%</p>
+                      <p className="fs-3 mb-0">last year</p>
                     </div>
                   </div>
                 </div>

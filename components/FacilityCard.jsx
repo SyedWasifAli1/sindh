@@ -531,7 +531,7 @@ const FacilityCard = () => {
                             selectedFacility.alloftheabove ? "All of the above" : null,
                           ]
                             .filter(Boolean)
-                            .join(", ")}
+                            .join("+")}
                         </p>
 
                         <div className="table-responsive">
