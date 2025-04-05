@@ -274,6 +274,12 @@ const FacilityCard = () => {
   const [filteredFacilities, setFilteredFacilities] = useState([]);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showHomeopathyModal, setShowHomeopathyModal] = useState(false);
+const [showTibbMatabModal, setShowTibbMatabModal] = useState(false);
+const [showGPModal, setShowGPModal] = useState(false);
+const [showPolyModal, setShowPolyModal] = useState(false);
+const [showSpecialtyModal, setShowSpecialtyModal] = useState(false);
+const [showDentalModal, setShowDentalModal] = useState(false);
   const [showLicenseModal, setShowLicenseModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedFacility, setSelectedFacility] = useState(null);
@@ -292,13 +298,18 @@ const FacilityCard = () => {
         ...doc.data(),
       }));
   
+      const allowedStatuses = ["Licensed", "Registered", "UnRegistered", "Pending"];
+      const filteredFacilities = facilitiesData.filter((facility) => 
+        allowedStatuses.includes(facility.status)
+      );
+
       const uniqueCities = Array.from(
-        new Set(facilitiesData.map((facility) => facility.cityName))
+        new Set(filteredFacilities.map((facility) => facility.cityName))
       ).map((city) => ({ id: city, city }));
   
-      setFacilities(facilitiesData);
+      setFacilities(filteredFacilities);
       setCity(uniqueCities);
-      setFilteredFacilities(facilitiesData);
+      setFilteredFacilities(filteredFacilities);
       setLoading(false);
     });
   
@@ -401,12 +412,46 @@ const FacilityCard = () => {
     }
   };
 
+  // const handleShowDetailsModal = (facility) => {
+  //   setSelectedFacility(facility);
+  //   setShowDetailsModal(true);
+  // };
+
   const handleShowDetailsModal = (facility) => {
     setSelectedFacility(facility);
-    setShowDetailsModal(true);
+    
+    // Check facility type and open appropriate modal
+    switch(facility.clinictype) {
+      case "Homeopathy Clinic":
+        setShowHomeopathyModal(true);
+        break;
+      case "TibbMatab Clinic":
+        setShowTibbMatabModal(true);
+        break;
+      case "GP Clinic":
+        setShowGPModal(true);
+        break;
+      case "Poly Clinic":
+        setShowPolyModal(true);
+        break;
+      case "Consultant / Single Specialty Clinic":
+        setShowSpecialtyModal(true);
+        break;
+      case "Dental Clinic":
+        setShowDentalModal(true);
+        break;
+      default:
+        setShowDefaultModal(true); // Fallback for unknown types
+    }
   };
 
   const handleCloseModals = () => {
+    setShowTibbMatabModal(false);
+    setShowHomeopathyModal(false);
+    setShowGPModal(false);
+    setShowPolyModal(false);
+    setShowSpecialtyModal(false);
+    setShowDentalModal(false);
     setShowDetailsModal(false);
     setShowConfirmModal(false);
     setShowLicenseModal(false);
@@ -503,7 +548,7 @@ const FacilityCard = () => {
         </div>
 
         {/* Details Modal */}
-        {showDetailsModal && (
+        {showTibbMatabModal  && (
           <div className="modal fade show" tabIndex="-1" style={{ display: 'block', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
             <div className="modal-dialog modal-lg">
               <div className="modal-content">
@@ -513,83 +558,586 @@ const FacilityCard = () => {
                 </div>
                 <div className="modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
                   <div id="detailsContent">
-                    {selectedFacility && (
-                      <div>
-                        <p><strong>Q1: What services are you providing at this facility?</strong><br /> * {selectedFacility.clinicName}</p>
-                        <p><strong>Q2: SHCC Assigned Category?</strong> <br /> * {selectedFacility.clinictype}</p>
-                        <p><strong>Q3: Who owns the facility?</strong> <br /> * {selectedFacility.ownership} <br /> * {selectedFacility.privateOwner}</p>
-                        <p><strong>Q4: Who manages the Facility?</strong><br /> * {selectedFacility.managername} <br /> * {selectedFacility.managerdesignation} <br /> * {selectedFacility.managementtype}</p>
-                        <p><strong>Q5: What is the service level category?</strong> <br /> * {selectedFacility.servicelevel}</p>
-                        <p>
-                          <strong>Q6: What is the operational level category?</strong> <br />
-                          {[
-                            selectedFacility.outpatient ? "Out Patient" : null,
-                            selectedFacility.ambulatorycare ? "Ambulatory Care" : null,
-                            selectedFacility.inpatient ? "In-Patient" : null,
-                            selectedFacility.ehabilitation ? "Rehabilitation" : null,
-                            selectedFacility.diagnostics ? "Diagnostics" : null,
-                            selectedFacility.alloftheabove ? "All of the above" : null,
-                          ]
-                            .filter(Boolean)
-                            .join("+")}
-                        </p>
+                  {selectedFacility && (
+  <div>
+    {selectedFacility.clinicName && 
+      <p><strong>Q1: What services are you providing at this facility?</strong><br /> Ans: {selectedFacility.clinicName}</p>
+    }
+    
+    {selectedFacility.clinictype && 
+      <p><strong>Q2: SHCC Assigned Category?</strong><br /> Ans: {selectedFacility.clinictype}</p>
+    }
+    
+    {(selectedFacility.ownership || selectedFacility.privateOwner) && 
+      <p><strong>Q3: Who owns the facility?</strong><br />
+        OwnerShip Type: {selectedFacility.ownership || ''}
+        {selectedFacility.privateOwner && <><br /> OwnerName: {selectedFacility.privateOwner}</>}
+      </p>
+    }
+    
+    {(selectedFacility.managerName || selectedFacility.managerDesignation || selectedFacility.managementType) && 
+      <p><strong>Q4: Who manages the Facility?</strong><br />
+        Name: {selectedFacility.managerName || ''}
+        {selectedFacility.managerDesignation && <><br />Designation: {selectedFacility.managerDesignation}</>}
+        {selectedFacility.managementType && <><br />Management: {selectedFacility.managementType}</>}
+      </p>
+    }
+    
+    {selectedFacility.serviceLevel && 
+      <p><strong>Q5: What is the service level category?</strong><br /> Ans: {selectedFacility.serviceLevel}</p>
+    }
+    
+    <p>
+      <strong>Q6: What is the operational level category?</strong><br />
+      Ans: {[
+        selectedFacility.isOutPatient ? "Out Patient" : null,
+        selectedFacility.isAmbulatoryCare ? "Ambulatory Care" : null,
+        selectedFacility.isInPatient ? "In-Patient" : null,
+        selectedFacility.isRehabilitation ? "Rehabilitation" : null,
+        selectedFacility.isDiagnostics ? "Diagnostics" : null,
+        selectedFacility.isAllOfAbove ? "All of the above" : null,
+      ]
+      .filter(Boolean)
+      .join(" + ")}
+    </p>
 
-                        <div className="table-responsive">
-                          <table className="table table-bordered table-striped">
-                            <thead>
-                              <tr>
-                                <th>Beds</th>
-                                <th>Inpatient {selectedFacility.inpatient ? "(Yes)" : "(No)"}</th>
-                                <th>Ambulatory {selectedFacility.ambulatorycare ? "(Yes)" : "(No)"}</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr>
-                                <td>ER Beds</td>
-                                <td>{selectedFacility.inPatienterBeds}</td>
-                                <td>{selectedFacility.ambulatoryerBeds}</td>
-                              </tr>
-                              <tr>
-                                <td>Holding Beds</td>
-                                <td>{selectedFacility.inPatientholdingBeds}</td>
-                                <td>{selectedFacility.ambulatoryholdingBeds}</td>
-                              </tr>
-                              <tr>
-                                <td>ICU Beds</td>
-                                <td>{selectedFacility.inPatienticuBeds}</td>
-                                <td>{selectedFacility.ambulatoryicuBeds}</td>
-                              </tr>
-                              <tr>
-                                <td>NICU Beds</td>
-                                <td>{selectedFacility.inPatientnicuBeds}</td>
-                                <td>{selectedFacility.ambulatorynicuBeds}</td>
-                              </tr>
-                              <tr>
-                                <td>PICU Beds</td>
-                                <td>{selectedFacility.inPatientpicuBeds}</td>
-                                <td>{selectedFacility.ambulatorypicuBeds}</td>
-                              </tr>
-                              <tr>
-                                <td>Private Beds</td>
-                                <td>{selectedFacility.inPatientprivateBeds}</td>
-                                <td>{selectedFacility.ambulatoryprivateBeds}</td>
-                              </tr>
-                              <tr>
-                                <td>Semi-General Beds</td>
-                                <td>{selectedFacility.inPatientsemiGeneralBeds}</td>
-                                <td>{selectedFacility.ambulatorysemiGeneralBeds}</td>
-                              </tr>
-                              <tr>
-                                <td>Specialized Care Beds</td>
-                                <td>{selectedFacility.inPatientspecializedCareBeds}</td>
-                                <td>{selectedFacility.ambulatoryspecializedCareBeds}</td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    )}
+    <div className="table-responsive">
+      <table className="table table-bordered table-striped">
+        <thead>
+          <tr>
+            <th>Beds</th>
+            <th>Inpatient {selectedFacility.inpatient ? "(Yes)" : "(No)"}</th>
+            <th>Ambulatory {selectedFacility.ambulatorycare ? "(Yes)" : "(No)"}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {[
+            { name: "ER Beds", inpatient: selectedFacility.inPatienterBeds, ambulatory: selectedFacility.ambulatoryerBeds },
+            { name: "Holding Beds", inpatient: selectedFacility.inPatientholdingBeds, ambulatory: selectedFacility.ambulatoryholdingBeds },
+            { name: "ICU Beds", inpatient: selectedFacility.inPatienticuBeds, ambulatory: selectedFacility.ambulatoryicuBeds },
+            { name: "NICU Beds", inpatient: selectedFacility.inPatientnicuBeds, ambulatory: selectedFacility.ambulatorynicuBeds },
+            { name: "PICU Beds", inpatient: selectedFacility.inPatientpicuBeds, ambulatory: selectedFacility.ambulatorypicuBeds },
+            { name: "Private Beds", inpatient: selectedFacility.inPatientprivateBeds, ambulatory: selectedFacility.ambulatoryprivateBeds },
+            { name: "Semi-General Beds", inpatient: selectedFacility.inPatientsemiGeneralBeds, ambulatory: selectedFacility.ambulatorysemiGeneralBeds },
+            { name: "Specialized Care Beds", inpatient: selectedFacility.inPatientspecializedCareBeds, ambulatory: selectedFacility.ambulatoryspecializedCareBeds }
+          ].map((bed, index) => (
+            <tr key={index}>
+              <td>{bed.name}</td>
+              <td>{bed.inpatient || '-'}</td>
+              <td>{bed.ambulatory || '-'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+)}
                   </div>
+                </div>
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-secondary" onClick={handleCloseModals}>Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        {showHomeopathyModal   && (
+          <div className="modal fade show" tabIndex="-1" style={{ display: 'block', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+            <div className="modal-dialog modal-lg">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title"> showHomeopathy Facility Details - {selectedFacility?.privateOwner}</h5>
+                  <button type="button" className="btn-close" onClick={handleCloseModals}></button>
+                </div>
+                <div className="modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+                  { <div id="detailsContent">
+                  {selectedFacility && (
+  <div>
+    {selectedFacility.clinicName && 
+  <p>
+    <strong>Q1: What services are you providing at this facility?</strong><br />
+    Ans:  {selectedFacility.clinicName}
+    {/* {[
+      selectedFacility.isHomeopathyOPD && "Homeopathy OPD",
+      selectedFacility.isDispensingHomeopathyMedicine && "Dispensing Homeopathy Medicine"
+    ]
+    .filter(Boolean)
+    .join(", ")} */}
+  </p>
+}
+    {selectedFacility.clinictype && 
+      <p><strong>Q2: SHCC Assigned Category?</strong><br /> Ans: {selectedFacility.clinictype}</p>
+    }
+    
+    {(selectedFacility.ownership || selectedFacility.privateOwner) && 
+      <p><strong>Q3: Who owns the facility?</strong><br />
+        OwnerShip Type: {selectedFacility.ownership || ''}
+        {selectedFacility.privateOwner && <><br /> Owner Name: {selectedFacility.privateOwner}</>}
+      </p>
+    }
+    
+    {(selectedFacility.managerName || selectedFacility.managerDesignation || selectedFacility.managementType) && 
+      <p><strong>Q4: Who manages the Facility?</strong><br />
+        Name: {selectedFacility.managerName || ''}
+        {selectedFacility.managerDesignation && <><br />Designation: {selectedFacility.managerDesignation}</>}
+        {selectedFacility.managementType && <><br />Management: {selectedFacility.managementType}</>}
+      </p>
+    }
+    
+    {selectedFacility.serviceLevel && 
+      <p><strong>Q5: What is the service level category?</strong><br /> Ans: {selectedFacility.serviceLevel}</p>
+    }
+    
+    <p>
+      <strong>Q6: What is the operational level category?</strong><br />
+      Ans: {[
+        selectedFacility.isOutPatient ? "Out Patient" : null,
+        selectedFacility.isAmbulatoryCare ? "Ambulatory Care" : null,
+        selectedFacility.isInPatient ? "In-Patient" : null,
+        selectedFacility.isRehabilitation ? "Rehabilitation" : null,
+        selectedFacility.isDiagnostics ? "Diagnostics" : null,
+        selectedFacility.isAllOfAbove ? "All of the above" : null,
+      ]
+      .filter(Boolean)
+      .join(" + ")}
+    </p>
+
+    <div className="table-responsive">
+      <table className="table table-bordered table-striped">
+        <thead>
+          <tr>
+            <th>Beds</th>
+            <th>Inpatient {selectedFacility.inpatient ? "(Yes)" : "(No)"}</th>
+            <th>Ambulatory {selectedFacility.ambulatorycare ? "(Yes)" : "(No)"}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {[
+            { name: "ER Beds", inpatient: selectedFacility.inPatienterBeds, ambulatory: selectedFacility.ambulatoryerBeds },
+            { name: "Holding Beds", inpatient: selectedFacility.inPatientholdingBeds, ambulatory: selectedFacility.ambulatoryholdingBeds },
+            { name: "ICU Beds", inpatient: selectedFacility.inPatienticuBeds, ambulatory: selectedFacility.ambulatoryicuBeds },
+            { name: "NICU Beds", inpatient: selectedFacility.inPatientnicuBeds, ambulatory: selectedFacility.ambulatorynicuBeds },
+            { name: "PICU Beds", inpatient: selectedFacility.inPatientpicuBeds, ambulatory: selectedFacility.ambulatorypicuBeds },
+            { name: "Private Beds", inpatient: selectedFacility.inPatientprivateBeds, ambulatory: selectedFacility.ambulatoryprivateBeds },
+            { name: "Semi-General Beds", inpatient: selectedFacility.inPatientsemiGeneralBeds, ambulatory: selectedFacility.ambulatorysemiGeneralBeds },
+            { name: "Specialized Care Beds", inpatient: selectedFacility.inPatientspecializedCareBeds, ambulatory: selectedFacility.ambulatoryspecializedCareBeds }
+          ].map((bed, index) => (
+            <tr key={index}>
+              <td>{bed.name}</td>
+              <td>{bed.inpatient || '-'}</td>
+              <td>{bed.ambulatory || '-'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+)}
+                  </div> }
+                </div>
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-secondary" onClick={handleCloseModals}>Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        {showGPModal   && (
+          <div className="modal fade show" tabIndex="-1" style={{ display: 'block', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+            <div className="modal-dialog modal-lg">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title"> GP Clinic Facility Details - {selectedFacility?.privateOwner}</h5>
+                  <button type="button" className="btn-close" onClick={handleCloseModals}></button>
+                </div>
+                <div className="modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+                  { <div id="detailsContent">
+                  {selectedFacility && (
+  <div>
+    {selectedFacility.clinicName && 
+  <p>
+    <strong>Q1: What services are you providing at this facility?</strong><br />
+    Ans: {selectedFacility.clinicName}
+    {/* {[
+      selectedFacility.isHomeopathyOPD && "Homeopathy OPD",
+      selectedFacility.isDispensingHomeopathyMedicine && "Dispensing Homeopathy Medicine"
+    ]
+    .filter(Boolean)
+    .join(", ")} */}
+  </p>
+}
+    {selectedFacility.clinictype && 
+      <p><strong>Q2: SHCC Assigned Category?</strong><br /> Ans: {selectedFacility.clinictype}</p>
+    }
+    
+    {(selectedFacility.ownership || selectedFacility.privateOwner) && 
+      <p><strong>Q3: Who owns the facility?</strong><br />
+        OwnerShip Type: {selectedFacility.ownership || ''}
+        {selectedFacility.privateOwner && <><br /> Owner Name:{selectedFacility.privateOwner}</>}
+      </p>
+    }
+    
+    {(selectedFacility.managerName || selectedFacility.managerDesignation || selectedFacility.managementType) && 
+      <p><strong>Q4: Who manages the Facility?</strong><br />
+        Ans: {selectedFacility.managerName || ''}
+        {selectedFacility.managerDesignation && <><br /> {selectedFacility.managerDesignation}</>}
+        {selectedFacility.managementType && <><br /> {selectedFacility.managementType}</>}
+      </p>
+    }
+    
+    {selectedFacility.serviceLevel && 
+      <p><strong>Q5: What is the service level category?</strong><br /> Ans: {selectedFacility.serviceLevel}</p>
+    }
+    
+    <p>
+      <strong>Q6: What is the operational level category?</strong><br />
+      Ans: {[
+        selectedFacility.isOutPatient ? "Out Patient" : null,
+        selectedFacility.isAmbulatoryCare ? "Ambulatory Care" : null,
+        selectedFacility.isInPatient ? "In-Patient" : null,
+        selectedFacility.isRehabilitation ? "Rehabilitation" : null,
+        selectedFacility.isDiagnostics ? "Diagnostics" : null,
+        selectedFacility.isAllOfAbove ? "All of the above" : null,
+      ]
+      .filter(Boolean)
+      .join(" + ")}
+    </p>
+
+    <div className="table-responsive">
+      <table className="table table-bordered table-striped">
+        <thead>
+          <tr>
+            <th>Beds</th>
+            <th>Inpatient {selectedFacility.inpatient ? "(Yes)" : "(No)"}</th>
+            <th>Ambulatory {selectedFacility.ambulatorycare ? "(Yes)" : "(No)"}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {[
+            { name: "ER Beds", inpatient: selectedFacility.inPatienterBeds, ambulatory: selectedFacility.ambulatoryerBeds },
+            { name: "Holding Beds", inpatient: selectedFacility.inPatientholdingBeds, ambulatory: selectedFacility.ambulatoryholdingBeds },
+            { name: "ICU Beds", inpatient: selectedFacility.inPatienticuBeds, ambulatory: selectedFacility.ambulatoryicuBeds },
+            { name: "NICU Beds", inpatient: selectedFacility.inPatientnicuBeds, ambulatory: selectedFacility.ambulatorynicuBeds },
+            { name: "PICU Beds", inpatient: selectedFacility.inPatientpicuBeds, ambulatory: selectedFacility.ambulatorypicuBeds },
+            { name: "Private Beds", inpatient: selectedFacility.inPatientprivateBeds, ambulatory: selectedFacility.ambulatoryprivateBeds },
+            { name: "Semi-General Beds", inpatient: selectedFacility.inPatientsemiGeneralBeds, ambulatory: selectedFacility.ambulatorysemiGeneralBeds },
+            { name: "Specialized Care Beds", inpatient: selectedFacility.inPatientspecializedCareBeds, ambulatory: selectedFacility.ambulatoryspecializedCareBeds }
+          ].map((bed, index) => (
+            <tr key={index}>
+              <td>{bed.name}</td>
+              <td>{bed.inpatient || '-'}</td>
+              <td>{bed.ambulatory || '-'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+)}
+                  </div> }
+                </div>
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-secondary" onClick={handleCloseModals}>Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        {showPolyModal   && (
+          <div className="modal fade show" tabIndex="-1" style={{ display: 'block', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+            <div className="modal-dialog modal-lg">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title"> Poly Clinic Facility Details - {selectedFacility?.privateOwner}</h5>
+                  <button type="button" className="btn-close" onClick={handleCloseModals}></button>
+                </div>
+                <div className="modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+                  { <div id="detailsContent">
+                  {selectedFacility && (
+  <div>
+    {selectedFacility.clinicName && 
+  <p>
+    <strong>Q1: What services are you providing at this facility?</strong><br />
+    Ans: {selectedFacility.clinicName}
+    {/* {[
+      selectedFacility.isHomeopathyOPD && "Homeopathy OPD",
+      selectedFacility.isDispensingHomeopathyMedicine && "Dispensing Homeopathy Medicine"
+    ]
+    .filter(Boolean)
+    .join(", ")} */}
+  </p>
+}
+    {selectedFacility.clinictype && 
+      <p><strong>Q2: SHCC Assigned Category?</strong><br /> Ans: {selectedFacility.clinictype}</p>
+    }
+    
+    {(selectedFacility.ownership || selectedFacility.privateOwner) && 
+      <p><strong>Q3: Who owns the facility?</strong><br />
+        OwnerShip Type: {selectedFacility.ownership || ''}
+        {selectedFacility.privateOwner && <><br /> Onwer Name: {selectedFacility.privateOwner}</>}
+      </p>
+    }
+    
+    {(selectedFacility.managerName || selectedFacility.managerDesignation || selectedFacility.managementType) && 
+      <p><strong>Q4: Who manages the Facility?</strong><br />
+        Name: {selectedFacility.managerName || ''}
+        {selectedFacility.managerDesignation && <><br />Designation: {selectedFacility.managerDesignation}</>}
+        {selectedFacility.managementType && <><br /> Manager: {selectedFacility.managementType}</>}
+      </p>
+    }
+    
+    {selectedFacility.serviceLevel && 
+      <p><strong>Q5: What is the service level category?</strong><br /> Ans: {selectedFacility.serviceLevel}</p>
+    }
+    
+    <p>
+      <strong>Q6: What is the operational level category?</strong><br />
+      Ans: {[
+        selectedFacility.isOutPatient ? "Out Patient" : null,
+        selectedFacility.isAmbulatoryCare ? "Ambulatory Care" : null,
+        selectedFacility.isInPatient ? "In-Patient" : null,
+        selectedFacility.isRehabilitation ? "Rehabilitation" : null,
+        selectedFacility.isDiagnostics ? "Diagnostics" : null,
+        selectedFacility.isAllOfAbove ? "All of the above" : null,
+      ]
+      .filter(Boolean)
+      .join(" + ")}
+    </p>
+
+    <div className="table-responsive">
+      <table className="table table-bordered table-striped">
+        <thead>
+          <tr>
+            <th>Beds</th>
+            <th>Inpatient {selectedFacility.inpatient ? "(Yes)" : "(No)"}</th>
+            <th>Ambulatory {selectedFacility.ambulatorycare ? "(Yes)" : "(No)"}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {[
+            { name: "ER Beds", inpatient: selectedFacility.inPatienterBeds, ambulatory: selectedFacility.ambulatoryerBeds },
+            { name: "Holding Beds", inpatient: selectedFacility.inPatientholdingBeds, ambulatory: selectedFacility.ambulatoryholdingBeds },
+            { name: "ICU Beds", inpatient: selectedFacility.inPatienticuBeds, ambulatory: selectedFacility.ambulatoryicuBeds },
+            { name: "NICU Beds", inpatient: selectedFacility.inPatientnicuBeds, ambulatory: selectedFacility.ambulatorynicuBeds },
+            { name: "PICU Beds", inpatient: selectedFacility.inPatientpicuBeds, ambulatory: selectedFacility.ambulatorypicuBeds },
+            { name: "Private Beds", inpatient: selectedFacility.inPatientprivateBeds, ambulatory: selectedFacility.ambulatoryprivateBeds },
+            { name: "Semi-General Beds", inpatient: selectedFacility.inPatientsemiGeneralBeds, ambulatory: selectedFacility.ambulatorysemiGeneralBeds },
+            { name: "Specialized Care Beds", inpatient: selectedFacility.inPatientspecializedCareBeds, ambulatory: selectedFacility.ambulatoryspecializedCareBeds }
+          ].map((bed, index) => (
+            <tr key={index}>
+              <td>{bed.name}</td>
+              <td>{bed.inpatient || '-'}</td>
+              <td>{bed.ambulatory || '-'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+)}
+                  </div> }
+                </div>
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-secondary" onClick={handleCloseModals}>Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        {showSpecialtyModal   && (
+          <div className="modal fade show" tabIndex="-1" style={{ display: 'block', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+            <div className="modal-dialog modal-lg">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title"> Special Facility Details - {selectedFacility?.privateOwner}</h5>
+                  <button type="button" className="btn-close" onClick={handleCloseModals}></button>
+                </div>
+                <div className="modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+                  { <div id="detailsContent">
+                  {selectedFacility && (
+  <div>
+    {selectedFacility.clinicName && 
+  <p>
+    <strong>Q1: What services are you providing at this facility?</strong><br />
+    Ans: {selectedFacility.clinicName}
+    {/* {[
+      selectedFacility.isHomeopathyOPD && "Homeopathy OPD",
+      selectedFacility.isDispensingHomeopathyMedicine && "Dispensing Homeopathy Medicine"
+    ]
+    .filter(Boolean)
+    .join(", ")} */}
+  </p>
+}
+    {selectedFacility.clinictype && 
+      <p><strong>Q2: SHCC Assigned Category?</strong><br /> Ans: {selectedFacility.clinictype}</p>
+    }
+    
+    {(selectedFacility.ownership || selectedFacility.privateOwner) && 
+      <p><strong>Q3: Who owns the facility?</strong><br />
+        OwnerShip Type: {selectedFacility.ownership || ''}
+        {selectedFacility.privateOwner && <><br /> Owner Name: {selectedFacility.privateOwner}</>}
+      </p>
+    }
+    
+    {(selectedFacility.managerName || selectedFacility.managerDesignation || selectedFacility.managementType) && 
+      <p><strong>Q4: Who manages the Facility?</strong><br />
+        Name: {selectedFacility.managerName || ''}
+        {selectedFacility.managerDesignation && <><br /> Designation: {selectedFacility.managerDesignation}</>}
+        {selectedFacility.managementType && <><br /> Management: {selectedFacility.managementType}</>}
+      </p>
+    }
+    
+    {selectedFacility.serviceLevel && 
+      <p><strong>Q5: What is the service level category?</strong><br /> Ans: {selectedFacility.serviceLevel}</p>
+    }
+    
+    <p>
+      <strong>Q6: What is the operational level category?</strong><br />
+      Ans: {[
+        selectedFacility.isOutPatient ? "Out Patient" : null,
+        selectedFacility.isAmbulatoryCare ? "Ambulatory Care" : null,
+        selectedFacility.isInPatient ? "In-Patient" : null,
+        selectedFacility.isRehabilitation ? "Rehabilitation" : null,
+        selectedFacility.isDiagnostics ? "Diagnostics" : null,
+        selectedFacility.isAllOfAbove ? "All of the above" : null,
+      ]
+      .filter(Boolean)
+      .join(" + ")}
+    </p>
+
+    <div className="table-responsive">
+      <table className="table table-bordered table-striped">
+        <thead>
+          <tr>
+            <th>Beds</th>
+            <th>Inpatient {selectedFacility.inpatient ? "(Yes)" : "(No)"}</th>
+            <th>Ambulatory {selectedFacility.ambulatorycare ? "(Yes)" : "(No)"}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {[
+            { name: "ER Beds", inpatient: selectedFacility.inPatienterBeds, ambulatory: selectedFacility.ambulatoryerBeds },
+            { name: "Holding Beds", inpatient: selectedFacility.inPatientholdingBeds, ambulatory: selectedFacility.ambulatoryholdingBeds },
+            { name: "ICU Beds", inpatient: selectedFacility.inPatienticuBeds, ambulatory: selectedFacility.ambulatoryicuBeds },
+            { name: "NICU Beds", inpatient: selectedFacility.inPatientnicuBeds, ambulatory: selectedFacility.ambulatorynicuBeds },
+            { name: "PICU Beds", inpatient: selectedFacility.inPatientpicuBeds, ambulatory: selectedFacility.ambulatorypicuBeds },
+            { name: "Private Beds", inpatient: selectedFacility.inPatientprivateBeds, ambulatory: selectedFacility.ambulatoryprivateBeds },
+            { name: "Semi-General Beds", inpatient: selectedFacility.inPatientsemiGeneralBeds, ambulatory: selectedFacility.ambulatorysemiGeneralBeds },
+            { name: "Specialized Care Beds", inpatient: selectedFacility.inPatientspecializedCareBeds, ambulatory: selectedFacility.ambulatoryspecializedCareBeds }
+          ].map((bed, index) => (
+            <tr key={index}>
+              <td>{bed.name}</td>
+              <td>{bed.inpatient || '-'}</td>
+              <td>{bed.ambulatory || '-'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+)}
+                  </div> }
+                </div>
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-secondary" onClick={handleCloseModals}>Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        {showDentalModal   && (
+          <div className="modal fade show" tabIndex="-1" style={{ display: 'block', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+            <div className="modal-dialog modal-lg">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title"> Dental Facility Details - {selectedFacility?.privateOwner}</h5>
+                  <button type="button" className="btn-close" onClick={handleCloseModals}></button>
+                </div>
+                <div className="modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+                  { <div id="detailsContent">
+                  {selectedFacility && (
+  <div>
+    {selectedFacility.clinicName && 
+  <p>
+    <strong>Q1: What services are you providing at this facility?</strong><br />
+    Ans: {selectedFacility.clinicName}
+    {/* {[
+      selectedFacility.isHomeopathyOPD && "Homeopathy OPD",
+      selectedFacility.isDispensingHomeopathyMedicine && "Dispensing Homeopathy Medicine"
+    ]
+    .filter(Boolean)
+    .join(", ")} */}
+  </p>
+}
+    {selectedFacility.clinictype && 
+      <p><strong>Q2: SHCC Assigned Category?</strong><br />Ans : {selectedFacility.clinictype} (BDS Doctor)</p>
+    }
+    
+    {(selectedFacility.ownership || selectedFacility.privateOwner) && 
+      <p><strong>Q3: Who owns the facility?</strong><br />
+         OnwerShip Type: {selectedFacility.ownership || ''}
+          {selectedFacility.privateOwner && <><br />Onwer Name: {selectedFacility.privateOwner}</>}
+      </p>
+    }
+    
+    {(selectedFacility.managerName || selectedFacility.managerDesignation || selectedFacility.managementType) && 
+      <p><strong>Q4: Who manages the Facility?</strong><br />
+        Name: {selectedFacility.managerName || ''}
+        {selectedFacility.managerDesignation && <><br /> Designation: {selectedFacility.managerDesignation}</>}
+        {selectedFacility.managementType && <><br /> Management Category: {selectedFacility.managementType}</>}
+      </p>
+    }
+    
+    {selectedFacility.serviceLevel && 
+      <p><strong>Q5: What is the service level category?</strong><br /> Ans: {selectedFacility.serviceLevel}</p>
+    }
+    
+    <p>
+      <strong>Q6: What is the operational level category?</strong><br />
+      Ans: {[
+        selectedFacility.isOutPatient ? "Out Patient" : null,
+        selectedFacility.isAmbulatoryCare ? "Ambulatory Care" : null,
+        selectedFacility.isInPatient ? "In-Patient" : null,
+        selectedFacility.isRehabilitation ? "Rehabilitation" : null,
+        selectedFacility.isDiagnostics ? "Diagnostics" : null,
+        // selectedFacility.isAllOfAbove ? "All of the above" : null,
+      ]
+      .filter(Boolean)
+      .join(" + ")}
+    </p>
+
+    <div className="table-responsive">
+      <table className="table table-bordered table-striped">
+        <thead>
+          <tr>
+            <th>Beds</th>
+            <th>Inpatient {selectedFacility.inpatient ? "(Yes)" : "(No)"}</th>
+            <th>Ambulatory {selectedFacility.ambulatorycare ? "(Yes)" : "(No)"}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {[
+            { name: "ER Beds", inpatient: selectedFacility.inPatienterBeds, ambulatory: selectedFacility.ambulatoryerBeds },
+            { name: "Holding Beds", inpatient: selectedFacility.inPatientholdingBeds, ambulatory: selectedFacility.ambulatoryholdingBeds },
+            { name: "ICU Beds", inpatient: selectedFacility.inPatienticuBeds, ambulatory: selectedFacility.ambulatoryicuBeds },
+            { name: "NICU Beds", inpatient: selectedFacility.inPatientnicuBeds, ambulatory: selectedFacility.ambulatorynicuBeds },
+            { name: "PICU Beds", inpatient: selectedFacility.inPatientpicuBeds, ambulatory: selectedFacility.ambulatorypicuBeds },
+            { name: "Private Beds", inpatient: selectedFacility.inPatientprivateBeds, ambulatory: selectedFacility.ambulatoryprivateBeds },
+            { name: "Semi-General Beds", inpatient: selectedFacility.inPatientsemiGeneralBeds, ambulatory: selectedFacility.ambulatorysemiGeneralBeds },
+            { name: "Specialized Care Beds", inpatient: selectedFacility.inPatientspecializedCareBeds, ambulatory: selectedFacility.ambulatoryspecializedCareBeds }
+          ].map((bed, index) => (
+            <tr key={index}>
+              <td>{bed.name}</td>
+              <td>{bed.inpatient || '-'}</td>
+              <td>{bed.ambulatory || '-'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+)}
+                  </div> }
                 </div>
                 <div className="modal-footer">
                   <button type="button" className="btn btn-secondary" onClick={handleCloseModals}>Close</button>
