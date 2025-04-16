@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
+// import Image from "next/image";
+
 import {
   FaHome,
   FaChartLine,
@@ -29,31 +30,42 @@ export default function Sidebar() {
     }
   };
   return (
-    <aside className="left-sidebar">
-      <div>
-        <div className="brand-logo d-flex align-items-center justify-content-between">
-          <Link href="/dashboard" className="text-nowrap logo-img">
-            <Image
-              src="/assets/images/logos/logo.png"
-              alt="Logo"
-              width={100}
-              height={90}
-              style={{ height: "90px" }}
-            />
-          </Link>
-          <button
-            className="close-btn d-xl-none d-block sidebartoggler cursor-pointer"
-            id="sidebarCollapse"
-          >
-            <i className="ti ti-x fs-6"></i>
-          </button>
-        </div>
-        <nav className="sidebar-nav scroll-sidebar">
+    <aside className="left-sidebar" >
+        {/* <div
+    className="brand-logo d-flex align-items-center justify-content-between position-relative"
+    style={{
+      backgroundImage: "url('/top_header.png')", // apni image ka path daalna
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      height: "10px",
+      padding: "10px 15px",
+    }}
+  >
+    <Link href="/dashboard" className="text-nowrap logo-img">
+      <Image
+        src="/assets/images/logos/logo.png"
+        alt="Logo"
+        width={100}
+        height={90}
+        className="position-relative z-1 mt-5"
+        style={{ objectFit: "contain" }}
+      />
+    </Link>
+    <button
+      className="close-btn d-xl-none d-block sidebartoggler cursor-pointer"
+      id="sidebarCollapse"
+    >
+      <i className="ti ti-x fs-6"></i>
+    </button>
+
+  </div> */}
+      <div >
+
+        <nav   style={{ 
+    marginTop: '100px' /* Adjust this value as needed */
+  }} className="sidebar-nav scroll-sidebar  ">
           <ul id="sidebarnav">
-            <li className="nav-small-cap">
-              <i className="ti ti-dots nav-small-cap-icon fs-4"></i>
-              <span className="hide-menu">Home</span>
-            </li>
+            
             <li className="sidebar-item">
               <Link className="sidebar-link" href="/dashboard">
                 <FaHome className="me-2" />
