@@ -535,8 +535,22 @@ const [showDentalModal, setShowDentalModal] = useState(false);
 </select>
                   </td>
                   <td>
-                    <button className="btn btn-sm btn-primary">Edit</button>
-                    <button className="btn btn-sm btn-danger">Delete</button>
+                    <button className="btn btn-sm btn-success">Edit</button>
+                    <button 
+  className="btn btn-sm btn-danger"
+  style={{
+    backgroundImage: "url('/top_header.png')",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+    color: "white", // Ensure text remains visible
+    textShadow: "0 1px 1px rgba(0,0,0,0.5)", // Improve text readability
+    border: "1px solid rgba(0,0,0,0.2)", // Optional: add border for better visibility
+    position: "relative" // For pseudo-element if needed
+  }}
+>
+  Delete
+</button>
                     <button className="btn btn-sm btn-info" onClick={() => handleShowDetailsModal(facility)}>
                       Show Details
                     </button>
