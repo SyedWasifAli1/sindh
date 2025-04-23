@@ -218,7 +218,7 @@ export default function Sidebar() {
                 }}
               >
                 <Image 
-                  src="/star.png"
+                  src="/Star.png"
                   alt="Licensed"
                   width={15}
                   height={18}
