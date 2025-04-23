@@ -82,7 +82,7 @@ export default function Sidebar() {
                 }}
               >
                 <Image 
-                  src="/icon.png"
+                  src="/Icon.png"
                   alt="Reports"
                   width={15}
                   height={18}
@@ -150,7 +150,7 @@ export default function Sidebar() {
                 }}
               >
                 <Image 
-                  src="/vector.png"
+                  src="/Vector"
                   alt="Un-Registered"
                   width={15}
                   height={18}
