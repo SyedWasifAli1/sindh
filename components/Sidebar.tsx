@@ -1,146 +1,271 @@
 "use client";
 
 import Link from "next/link";
-// import Image from "next/image";
-
-import {
-  FaHome,
-  FaChartLine,
-  FaList,
-  FaPencilAlt,
-  FaSignOutAlt,
-} from "react-icons/fa";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { signOut } from "firebase/auth";
 import { auth } from '../app/lib/firebase-config';
 import { useRouter } from "next/navigation";
 
-
 export default function Sidebar() {
-
-
-    const router = useRouter(); 
+  const router = useRouter();
+  const pathname = usePathname();
+  
   const handleLogout = async () => {
     try {
-      await signOut(auth); // Sign out the user from Firebases
+      await signOut(auth);
       alert('You have been logged out!');
-      router.push('/'); // Redirect to login page (or wherever you want to redirect the user)
+      router.push('/');
     } catch (error) {
       console.error('Error signing out:', error);
       alert('Failed to sign out. Please try again.');
     }
   };
+
+  // Improved function to check if a link is active
+  const isActive = (href: string) => {
+    // Exact match for dashboard
+    if (href === '/dashboard') {
+      return pathname === href;
+    }
+    // For other links, check if path starts with href
+    return pathname.startsWith(href);
+  };
+
   return (
-    <aside className="left-sidebar" >
-        {/* <div
-    className="brand-logo d-flex align-items-center justify-content-between position-relative"
-    style={{
-      backgroundImage: "url('/top_header.png')", // apni image ka path daalna
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-      height: "10px",
-      padding: "10px 15px",
-    }}
-  >
-    <Link href="/dashboard" className="text-nowrap logo-img">
-      <Image
-        src="/assets/images/logos/logo.png"
-        alt="Logo"
-        width={100}
-        height={90}
-        className="position-relative z-1 mt-5"
-        style={{ objectFit: "contain" }}
-      />
-    </Link>
-    <button
-      className="close-btn d-xl-none d-block sidebartoggler cursor-pointer"
-      id="sidebarCollapse"
-    >
-      <i className="ti ti-x fs-6"></i>
-    </button>
-
-  </div> */}
-      <div >
-
-        <nav   style={{ 
-    marginTop: '100px' /* Adjust this value as needed */
-  }} className="sidebar-nav scroll-sidebar  ">
+    <aside className="left-sidebar">
+      <div>
+        <nav style={{ marginTop: '100px' }} className="sidebar-nav scroll-sidebar">
           <ul id="sidebarnav">
-            
             <li className="sidebar-item">
-              <Link className="sidebar-link" href="/dashboard">
-                <FaHome className="me-2" />
+              <Link 
+                className="sidebar-link" 
+                href="/dashboard"
+                style={{
+                  color: isActive('/dashboard') ? '#FF0000' : 'inherit',
+                  position: 'relative',
+                  paddingRight: '15px' // Space for the dot
+                }}
+              >
+                <Image 
+                  src="/Home.png"
+                  alt="Dashboard"
+                  width={15}
+                  height={18}
+                  className="me-2"
+                />
                 <span className="hide-menu">Dashboard</span>
+                {isActive('/dashboard') && (
+                  <span 
+                    style={{
+                      position: 'absolute',
+                      right: 0,
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      width: '6px',
+                      height: '6px',
+                      backgroundColor: '#FF0000',
+                      borderRadius: '50%'
+                    }}
+                  />
+                )}
               </Link>
             </li>
             <li className="sidebar-item">
-              <Link className="sidebar-link" href="/dashboard/reporting">
-                <FaChartLine className="me-2" />
+              <Link 
+                className="sidebar-link"
+                href="/dashboard/reporting"
+                style={{
+                  color: isActive('/dashboard/reporting') ? '#FF0000' : 'inherit',
+                  position: 'relative',
+                  paddingRight: '15px'
+                }}
+              >
+                <Image 
+                  src="/icon.png"
+                  alt="Reports"
+                  width={15}
+                  height={18}
+                  className="me-2"
+                />
                 <span className="hide-menu">Reports</span>
+                {isActive('/dashboard/reporting') && (
+                  <span 
+                    style={{
+                      position: 'absolute',
+                      right: 0,
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      width: '6px',
+                      height: '6px',
+                      backgroundColor: '#FF0000',
+                      borderRadius: '50%'
+                    }}
+                  />
+                )}
               </Link>
             </li>
             <li className="sidebar-item">
-              <Link className="sidebar-link" href="/dashboard/list-of-facility">
-                <FaList className="me-2" />
+              <Link 
+                className="sidebar-link"
+                href="/dashboard/list-of-facility"
+                style={{
+                  color: isActive('/dashboard/list-of-facility') ? '#FF0000' : 'inherit',
+                  position: 'relative',
+                  paddingRight: '15px'
+                }}
+              >
+                <Image 
+                  src="/icon1.png"
+                  alt="List"
+                  width={15}
+                  height={18}
+                  className="me-2"
+                />
                 <span className="hide-menu">List of Facility</span>
+                {isActive('/dashboard/list-of-facility') && (
+                  <span 
+                    style={{
+                      position: 'absolute',
+                      right: 0,
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      width: '6px',
+                      height: '6px',
+                      backgroundColor: '#FF0000',
+                      borderRadius: '50%'
+                    }}
+                  />
+                )}
               </Link>
             </li>
             <li className="sidebar-item">
-              <Link className="sidebar-link" href="/dashboard/registered">
-                <FaList className="me-2" />
+              <Link 
+                className="sidebar-link"
+                href="/dashboard/Un-Registered"
+                style={{
+                  color: isActive('/dashboard/Un-Registered') ? '#FF0000' : 'inherit',
+                  position: 'relative',
+                  paddingRight: '15px'
+                }}
+              >
+                <Image 
+                  src="/vector.png"
+                  alt="Un-Registered"
+                  width={15}
+                  height={18}
+                  className="me-2"
+                />
+                <span className="hide-menu">Un-Registered</span>
+                {isActive('/dashboard/Un-Registered') && (
+                  <span 
+                    style={{
+                      position: 'absolute',
+                      right: 0,
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      width: '6px',
+                      height: '6px',
+                      backgroundColor: '#FF0000',
+                      borderRadius: '50%'
+                    }}
+                  />
+                )}
+              </Link>
+            </li>
+            <li className="sidebar-item">
+              <Link 
+                className="sidebar-link"
+                href="/dashboard/registered"
+                style={{
+                  color: isActive('/dashboard/registered') ? '#FF0000' : 'inherit',
+                  position: 'relative',
+                  paddingRight: '15px'
+                }}
+              >
+                <Image 
+                  src="/vector1.png"
+                  alt="Registered"
+                  width={15}
+                  height={18}
+                  className="me-2"
+                />
                 <span className="hide-menu">Registered</span>
+                {isActive('/dashboard/registered') && (
+                  <span 
+                    style={{
+                      position: 'absolute',
+                      right: 0,
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      width: '6px',
+                      height: '6px',
+                      backgroundColor: '#FF0000',
+                      borderRadius: '50%'
+                    }}
+                  />
+                )}
               </Link>
             </li>
             <li className="sidebar-item">
-              <Link className="sidebar-link" href="/dashboard/unregistered">
-                <FaPencilAlt className="me-2" />
-                <span className="hide-menu">UnRegistered</span>
-              </Link>
-            </li>
-            <li className="sidebar-item">
-              <Link className="sidebar-link" href="/dashboard/licensed">
-                <FaPencilAlt className="me-2" />
+              <Link 
+                className="sidebar-link"
+                href="/dashboard/licensed"
+                style={{
+                  color: isActive('/dashboard/licensed') ? '#FF0000' : 'inherit',
+                  position: 'relative',
+                  paddingRight: '15px'
+                }}
+              >
+                <Image 
+                  src="/star.png"
+                  alt="Licensed"
+                  width={15}
+                  height={18}
+                  className="me-2"
+                />
                 <span className="hide-menu">licensed</span>
+                {isActive('/dashboard/licensed') && (
+                  <span 
+                    style={{
+                      position: 'absolute',
+                      right: 0,
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      width: '6px',
+                      height: '6px',
+                      backgroundColor: '#FF0000',
+                      borderRadius: '50%'
+                    }}
+                  />
+                )}
               </Link>
             </li>
             <li className="sidebar-item">
-              <button className="sidebar-link-button"  onClick={handleLogout}>
-                <FaSignOutAlt className="me-2" />
+              <button 
+                className="sidebar-link-button" 
+                onClick={handleLogout}
+                style={{
+                  color: 'inherit',
+                  position: 'relative'
+                }}
+              >
+                <Image 
+                  src="/logout.png"
+                  alt="Signout"
+                  width={15}
+                  height={18}
+                  className="me-2"
+                />
                 <span className="hide-menu">Signout</span>
               </button>
             </li>
           </ul>
-          {/* <div className="unlimited-access hide-menu bg-light-secondary position-relative mb-7 mt-5 rounded">
-            <div className="d-flex">
-              <div className="unlimited-access-title me-3">
-                <h6 className="fw-semibold fs-4 mb-6 text-dark w-85">
-                  Sindh Healthcare Commission
-                </h6>
-                <Link
-                  href="/dashboard"
-                  target="_blank"
-                  className="btn btn-secondary fs-2 fw-semibold"
-                >
-                  Check
-                </Link>
-              </div>
-              <div className="unlimited-access-img">
-                <Image
-                  src="/assets/images/backgrounds/rocket.png"
-                  alt="Rocket"
-                  width={100}
-                  height={100}
-                  className="img-fluid"
-                />
-              </div>
-            </div>
-          </div> */}
         </nav>
       </div>
     </aside>
   );
 }
-
-
 
 // export default function Sidebar() {
 //     return (
@@ -189,9 +314,9 @@ export default function Sidebar() {
 //                 </a>
 //               </li>
 //               <li className="sidebar-item">
-//                 <a className="sidebar-link" href="./unregistered.html" aria-expanded="false">
+//                 <a className="sidebar-link" href="./Un-Registered.html" aria-expanded="false">
 //                   <i className="ti ti-pencil"></i>
-//                   <span className="hide-menu">UnRegistered</span>
+//                   <span className="hide-menu">Un-Registered</span>
 //                 </a>
 //               </li>
 //               <li className="sidebar-item">

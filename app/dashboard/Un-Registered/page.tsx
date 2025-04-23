@@ -4,7 +4,7 @@ import FacilityList from '@/components/FacilityList';
 const UnRegistered = () => {
   return (
     <div>
-      <FacilityList status="UnRegistered" />
+      <FacilityList status="Un-Registered" />
     </div>
   );
 };
@@ -25,14 +25,14 @@ export default UnRegistered;
 //   date: string;
 // }
 
-// const UnRegisteredFacilities = () => {
+// const Un-RegisteredFacilities = () => {
 //   const [facilities] = useState<Facility[]>([
-//     { name: "ABC Hospital", city: "Karachi", status: "UnRegistered", date: "2023-10-01" },
-//     { name: "XYZ Clinic", city: "Hyderabad", status: "UnRegistered", date: "2023-09-25" },
-//     { name: "PQR Diagnostic Center", city: "Sukkur", status: "UnRegistered", date: "2023-09-20" },
-//     { name: "LMN Pharmacy", city: "Larkana", status: "UnRegistered", date: "2023-09-15" },
-//     { name: "EFG Lab", city: "Mirpur Khas", status: "UnRegistered", date: "2023-09-10" },
-//     { name: "RST Medical Center", city: "Karachi", status: "UnRegistered", date: "2023-09-05" },
+//     { name: "ABC Hospital", city: "Karachi", status: "Un-Registered", date: "2023-10-01" },
+//     { name: "XYZ Clinic", city: "Hyderabad", status: "Un-Registered", date: "2023-09-25" },
+//     { name: "PQR Diagnostic Center", city: "Sukkur", status: "Un-Registered", date: "2023-09-20" },
+//     { name: "LMN Pharmacy", city: "Larkana", status: "Un-Registered", date: "2023-09-15" },
+//     { name: "EFG Lab", city: "Mirpur Khas", status: "Un-Registered", date: "2023-09-10" },
+//     { name: "RST Medical Center", city: "Karachi", status: "Un-Registered", date: "2023-09-05" },
 //   ]);
 
 //   const [filteredFacilities, setFilteredFacilities] = useState<Facility[]>(facilities);
@@ -74,7 +74,7 @@ export default UnRegistered;
 //         <div className="row">
 //           <div className="col-lg-12">
 //             <div className="facility-card">
-//               <h5 className="card-title fw-semibold">UnRegistered Facilities</h5>
+//               <h5 className="card-title fw-semibold">Un-Registered Facilities</h5>
 //               <div className="row mb-4">
 //                 <div className="col-md-4">
 //                   <label htmlFor="cityFilter" className="form-label">
@@ -174,4 +174,4 @@ export default UnRegistered;
 //   );
 // };
 
-// export default UnRegisteredFacilities;
+// export default Un-RegisteredFacilities;

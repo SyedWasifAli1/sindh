@@ -145,6 +145,7 @@
 
 //     );
 // }
+
 "use client";
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
@@ -172,6 +173,7 @@ interface Filters {
   endDate: string;
   city: string;
   status: string;
+  clinicType: string;
 }
 
 interface CountData {
@@ -186,6 +188,7 @@ const Reports = () => {
     endDate: "",
     city: "",
     status: "",
+    clinicType: ""
   });
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
@@ -199,7 +202,7 @@ const Reports = () => {
         ...doc.data(),
       })) as Facility[];
   
-      const allowedStatuses = ["Licensed", "Registered", "UnRegistered", "Pending"];
+      const allowedStatuses = ["Licensed", "Registered", "Un-Registered", "Pending"];
       const filteredFacilities = facilitiesData.filter((facility) => 
         facility.status && allowedStatuses.includes(facility.status)
       );
@@ -217,130 +220,114 @@ const Reports = () => {
     setCurrentPage(1);
   };
 
-  const handleGenerateReport = async () => {
-    try {
-      // Get the chart containers
-      const chart1Container = document.querySelector('#registrations-chart');
-      const chart2Container = document.querySelector('#facility-chart');
-  
-      if (!chart1Container || !chart2Container) {
-        console.error('Chart containers not found');
-        return;
-      }
-  
-      // Get the SVG elements (ApexCharts renders SVG)
-      const chart1SVG = chart1Container.querySelector('svg');
-      const chart2SVG = chart2Container.querySelector('svg');
-  
-      if (!chart1SVG || !chart2SVG) {
-        console.error('Chart SVGs not found');
-        return;
-      }
-  
-      // Create a canvas to draw the combined image
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-  
-      // Set canvas dimensions
-      const width = Math.max(chart1SVG.clientWidth, chart2SVG.clientWidth);
-      const height = chart1SVG.clientHeight + chart2SVG.clientHeight + 100; // Extra space for title and filters
-      canvas.width = width;
-      canvas.height = height;
-  
-      // Fill with white background
-      ctx.fillStyle = 'white';
-      ctx.fillRect(0, 0, width, height);
-  
-      // Add title
-      ctx.fillStyle = 'black';
-      ctx.font = 'bold 20px Arial';
-      ctx.textAlign = 'center';
-      ctx.fillText('Facility Report', width / 2, 30);
-  
-      // Add filters text
-      ctx.font = '14px Arial';
-      const filtersText = getAppliedFiltersText();
-      ctx.fillText(filtersText, width / 2, 60);
-  
-      // Convert SVGs to images and draw them
-      const chart1Img = await svgToImage(chart1SVG);
-      const chart2Img = await svgToImage(chart2SVG);
-  
-      // Draw first chart
-      ctx.drawImage(chart1Img, (width - chart1SVG.clientWidth) / 2, 80);
-  
-      // Draw second chart
-      ctx.drawImage(chart2Img, (width - chart2SVG.clientWidth) / 2, 80 + chart1SVG.clientHeight + 20);
-  
-      // Convert to image and download
-      const image = canvas.toDataURL('image/png');
-      const link = document.createElement('a');
-      link.href = image;
-      link.download = `Facility_Report_${new Date().toISOString().slice(0, 10)}.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (error) {
-      console.error('Error generating report:', error);
-      alert('Error generating report. Please try again.');
-    }
-  };
-
-  // Helper function to convert SVG to Image
-  const svgToImage = (svg: SVGElement): Promise<HTMLImageElement> => {
-    return new Promise((resolve, reject) => {
-      const serializer = new XMLSerializer();
-      const svgStr = serializer.serializeToString(svg);
+  // const handleGenerateReport = async () => {
+  //   try {
+  //     const doc = new jsPDF();
       
-      const img = new Image();
-      img.onload = () => resolve(img);
-      img.onerror = reject;
+  //     // Add title with filters
+  //     doc.setFontSize(16);
+  //     doc.setTextColor(40);
+  //     doc.text('Facilities Report', 105, 15, { align: 'center' });
       
-      img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgStr)));
-    });
-  };
+  //     doc.setFontSize(10);
+  //     doc.text(`Filters: ${getAppliedFiltersText()}`, 105, 22, { align: 'center' });
+      
+  //     // Add charts
+  //     const chart1Container = document.querySelector('#registrations-chart');
+  //     const chart2Container = document.querySelector('#facility-chart');
+      
+  //     if (chart1Container && chart2Container) {
+  //       const chart1SVG = chart1Container.querySelector('svg');
+  //       const chart2SVG = chart2Container.querySelector('svg');
+        
+  //       if (chart1SVG && chart2SVG) {
+  //         // Convert SVGs to canvas
+  //         const chart1Canvas = await svgToCanvas(chart1SVG);
+  //         const chart2Canvas = await svgToCanvas(chart2SVG);
+          
+  //         // Add first chart
+  //         doc.addImage(chart1Canvas.toDataURL('image/png'), 'PNG', 15, 30, 180, 90);
+          
+  //         // Add second chart
+  //         doc.addImage(chart2Canvas.toDataURL('image/png'), 'PNG', 15, 130, 180, 90);
+  //       }
+  //     }
+      
+  //     // Add table
+  //     const headers = [['Owner', 'Facility Name', 'Facility Type', 'City', 'Status', 'Registration Date']];
+  //     const data = filteredFacilities.map(facility => [
+  //       facility.privateOwner || 'N/A',
+  //       facility.clinicName || 'N/A',
+  //       facility.clinictype || 'N/A',
+  //       facility.cityName || 'N/A',
+  //       facility.status || 'N/A',
+  //       formatTimestamp(facility.createdDate)
+  //     ]);
 
-  const getAppliedFiltersText = () => {
-    const filtersText = [];
-    if (filters.startDate) filtersText.push(`From: ${format(new Date(filters.startDate), 'MMM dd, yyyy')}`);
-    if (filters.endDate) filtersText.push(`To: ${format(new Date(filters.endDate), 'MMM dd, yyyy')}`);
-    if (filters.city) filtersText.push(`City: ${filters.city}`);
-    if (filters.status) filtersText.push(`Status: ${filters.status}`);
+  //     (doc as any).autoTable({
+  //       head: headers,
+  //       body: data,
+  //       startY: 230,
+  //       styles: { fontSize: 8 },
+  //       headStyles: { fillColor: [182, 19, 25] },
+  //       margin: { top: 230 }
+  //     });
+
+  //     doc.save(`facilities_report_${new Date().toISOString().slice(0, 10)}.pdf`);
+  //   } catch (error) {
+  //     console.error('Error generating PDF:', error);
+  //     alert('Error generating PDF report. Please try again.');
+  //   }
+  // };
+
+  // const svgToCanvas = async (svg: SVGElement): Promise<HTMLCanvasElement> => {
+  //   return new Promise((resolve) => {
+  //     const canvas = document.createElement('canvas');
+  //     const ctx = canvas.getContext('2d')!;
+  //     const data = new XMLSerializer().serializeToString(svg);
+  //     const img = new Image();
+      
+  //     img.onload = () => {
+  //       canvas.width = img.width;
+  //       canvas.height = img.height;
+  //       ctx.drawImage(img, 0, 0);
+  //       resolve(canvas);
+  //     };
+      
+  //     img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(data)));
+  //   });
+  // };
+
+  // const getAppliedFiltersText = () => {
+  //   const filtersText = [];
+  //   if (filters.startDate) filtersText.push(`From: ${format(new Date(filters.startDate), 'MMM dd, yyyy')}`);
+  //   if (filters.endDate) filtersText.push(`To: ${format(new Date(filters.endDate), 'MMM dd, yyyy')}`);
+  //   if (filters.city) filtersText.push(`City: ${filters.city}`);
+  //   if (filters.status) filtersText.push(`Status: ${filters.status}`);
+  //   if (filters.clinicType) filtersText.push(`Clinic Type: ${filters.clinicType}`);
     
-    return filtersText.length > 0 ? filtersText.join(' | ') : 'All Filters';
-  };
+  //   return filtersText.length > 0 ? filtersText.join(' | ') : 'All Filters';
+  // };
 
+  type TimestampType = string | number | { seconds: number } | undefined;
 
-type TimestampInput = 
-  | { seconds: number } // Firebase timestamp format
-  | string             // ISO date string
-  | number             // Unix timestamp in milliseconds
-  | null
-  | undefined;
+const formatTimestamp = (timestamp: TimestampType): string => {
+  if (!timestamp) return 'N/A';
 
-const formatTimestamp = (timestamp: TimestampInput): string => {
-    if (!timestamp) return 'N/A';
-    
-    try {
-      if (typeof timestamp === 'object' && 'seconds' in timestamp) {
-        // Handle Firebase timestamp { seconds: number }
-        return format(new Date(timestamp.seconds * 1000), 'MMM dd, yyyy');
-      }
-      if (typeof timestamp === 'string') {
-        // Handle ISO date strings
-        return format(new Date(timestamp), 'MMM dd, yyyy');
-      }
-      if (typeof timestamp === 'number') {
-        // Handle Unix timestamps (milliseconds)
-        return format(new Date(timestamp), 'MMM dd, yyyy');
-      }
-      return 'N/A';
-    } catch (error) {
-      console.error('Error formatting date:', error);
-      return 'N/A';
+  try {
+    if (typeof timestamp === 'object' && 'seconds' in timestamp) {
+      return format(new Date(timestamp.seconds * 1000), 'MMM dd, yyyy');
     }
+    if (typeof timestamp === 'string' || typeof timestamp === 'number') {
+      return format(new Date(timestamp), 'MMM dd, yyyy');
+    }
+    return 'N/A';
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return 'N/A';
+  }
 };
+
 
   const getMonthName = (monthIndex: number) => {
     const months = [
@@ -375,60 +362,6 @@ const formatTimestamp = (timestamp: TimestampInput): string => {
       data: monthCounts
     };
   };
-
-  // const exportToPDF = () => {
-  //   const doc = new jsPDF();
-    
-  //   // Add title with filters
-  //   doc.setFontSize(16);
-  //   doc.text('Facilities Report', 14, 16);
-  //   doc.setFontSize(10);
-  //   doc.text(`Filters: ${getAppliedFiltersText()}`, 14, 24);
-    
-  //   // Add charts
-  //   const chartElements = document.querySelectorAll('.chart-card');
-  //   let yPosition = 32;
-    
-  //   chartElements.forEach((chartElement, index) => {
-  //     const chartTitle = chartElement.querySelector('h5')?.textContent || `Chart ${index + 1}`;
-  //     const svg = chartElement.querySelector('svg');
-      
-  //     if (svg) {
-  //       // Add chart title
-  //       doc.text(chartTitle, 14, yPosition);
-  //       yPosition += 6;
-        
-  //       // Convert SVG to image
-  //       const serializer = new XMLSerializer();
-  //       const svgStr = serializer.serializeToString(svg);
-  //       const svgUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgStr)));
-        
-  //       // Add chart image
-  //       doc.addImage(svgUrl, 'SVG', 14, yPosition, 180, 90);
-  //       yPosition += 100;
-  //     }
-  //   });
-    
-  //   // Add table
-  //   const headers = [['Owner', 'Facility Name', 'Facility Type', 'City', 'Status']];
-  //   const data = paginatedFacilities.map(facility => [
-  //     facility.privateOwner || 'N/A',
-  //     facility.clinicName || 'N/A',
-  //     facility.clinictype || 'N/A',
-  //     facility.cityName || 'N/A',
-  //     facility.status || 'N/A'
-  //   ]);
-
-  //   (doc as any).autoTable({
-  //     head: headers,
-  //     body: data,
-  //     startY: yPosition,
-  //     styles: { fontSize: 8 },
-  //     headStyles: { fillColor: [22, 160, 133] }
-  //   });
-
-  //   doc.save('facilities_report.pdf');
-  // };
 
   const exportToExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(
@@ -484,7 +417,11 @@ const formatTimestamp = (timestamp: TimestampInput): string => {
     const matchesStatus = filters.status ? 
       facility.status === filters.status : true;
     
-    return matchesCity && matchesStatus;
+    // Clinic Type filter
+    const matchesClinicType = filters.clinicType ? 
+      (facility.clinictype || '').toLowerCase() === filters.clinicType.toLowerCase() : true;
+    
+    return matchesCity && matchesStatus && matchesClinicType;
   });
 
   // Pagination
@@ -502,9 +439,20 @@ const formatTimestamp = (timestamp: TimestampInput): string => {
     return acc;
   }, {});
 
-  // Get unique cities and statuses for filter dropdowns
-  const cities = Array.from(new Set(facilities.map(f => f.cityName).filter(Boolean))) as string[];
-  const statuses = ["Licensed", "Registered", "UnRegistered", "Pending"];
+  // Get unique values for filter dropdowns
+  const cities = Array.from(
+    new Set(facilities.map(f => f.cityName).filter((name): name is string => Boolean(name)))
+  );
+  
+  const statuses = ["Licensed", "Registered", "Un-Registered", "Pending"];
+  const clinicTypes = [
+    "Dental Clinic",
+    "Homeopathy Clinic",
+    "Poly Clinic",
+    "Consultant / Single Specialty Clinic",
+    "GP Clinic",
+    "TibbMatab Clinic"
+  ];
 
   return (
     <>
@@ -536,7 +484,7 @@ const formatTimestamp = (timestamp: TimestampInput): string => {
                       onChange={handleFilterChange}
                     />
                   </div>
-                  <div className="col-md-3">
+                  <div className="col-md-2">
                     <label className="form-label">City</label>
                     <select
                       className="form-select"
@@ -550,7 +498,7 @@ const formatTimestamp = (timestamp: TimestampInput): string => {
                       ))}
                     </select>
                   </div>
-                  <div className="col-md-3">
+                  <div className="col-md-2">
                     <label className="form-label">Status</label>
                     <select
                       className="form-select"
@@ -564,9 +512,31 @@ const formatTimestamp = (timestamp: TimestampInput): string => {
                       ))}
                     </select>
                   </div>
+                  <div className="col-md-2">
+                    <label className="form-label">Clinic Type</label>
+                    <select
+                      className="form-select"
+                      name="clinicType"
+                      value={filters.clinicType}
+                      onChange={handleFilterChange}
+                    >
+                      <option value="">All Types</option>
+                      {clinicTypes.map(type => (
+                        <option key={type} value={type}>{type}</option>
+                      ))}
+                    </select>
+                  </div>
                   <div className="col-md-2 d-flex align-items-end">
-                    <button className="btn btn-primary w-100" onClick={handleGenerateReport}>
-                      Generate Report
+                    <button 
+                      className="btn btn-primary w-100" 
+                      // onClick={}
+                      style={{
+                        backgroundColor: "rgb(182, 19, 25)",
+                        color: "white",
+                        fontWeight: "bold"
+                      }}
+                    >
+                      Generate Report (PDF)
                     </button>
                   </div>
                 </div>
@@ -584,30 +554,7 @@ const formatTimestamp = (timestamp: TimestampInput): string => {
                     chart: { 
                       id: "registrations-chart",
                       toolbar: {
-                        show: true,
-                        tools: {
-                          download: true,
-                          selection: true,
-                          zoom: true,
-                          zoomin: true,
-                          zoomout: true,
-                          pan: true,
-                          reset: true
-                        },
-                        export: {
-                          csv: {
-                            filename: 'monthly-registrations',
-                            columnDelimiter: ',',
-                            headerCategory: 'Month',
-                            headerValue: 'Registrations',
-                          },
-                          svg: {
-                            filename: 'monthly-registrations',
-                          },
-                          png: {
-                            filename: 'monthly-registrations',
-                          }
-                        }
+                        show: true
                       }
                     },
                     xaxis: {
@@ -643,27 +590,7 @@ const formatTimestamp = (timestamp: TimestampInput): string => {
                     chart: { 
                       id: "facility-chart",
                       toolbar: {
-                        show: true,
-                        tools: {
-                          download: true,
-                          selection: true,
-                          zoom: true,
-                          zoomin: true,
-                          zoomout: true,
-                          pan: true,
-                          reset: true
-                        },
-                        export: {
-                          csv: {
-                            filename: 'facility-types',
-                          },
-                          svg: {
-                            filename: 'facility-types',
-                          },
-                          png: {
-                            filename: 'facility-types',
-                          }
-                        }
+                        show: true
                       }
                     }, 
                     labels: Object.keys(filteredFacilityTypeCount),
@@ -691,6 +618,7 @@ const formatTimestamp = (timestamp: TimestampInput): string => {
                         <th>Facility Type</th>
                         <th>City</th>
                         <th>Status</th>
+                        <th>Registration Date</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -709,6 +637,7 @@ const formatTimestamp = (timestamp: TimestampInput): string => {
                               {facility.status}
                             </span>
                           </td>
+                          <td>{formatTimestamp(facility.createdDate)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -758,35 +687,17 @@ const formatTimestamp = (timestamp: TimestampInput): string => {
           <div className="row">
             <div className="col-lg-12">
               <div className="d-flex justify-content-end mt-3">
-
-
-                {/* <button className="btn btn-secondary me-2"   style={{
-    backgroundImage: "url('/top_header.png')",
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    backgroundRepeat: "no-repeat",
-    color: "white", // Ensure text remains visible
-    textShadow: "0 1px 1px rgba(0,0,0,0.5)", // Improve text readability
-    border: "1px solid rgba(0,0,0,0.2)", // Optional: add border for better visibility
-    position: "relative" // For pseudo-element if needed
-  }} onClick={exportToPDF}>
-                  Export as PDF
-                </button> */}
-                <button   style={{
-    backgroundImage: "url('/top_header.png')",
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    backgroundRepeat: "no-repeat",
-    color: "white", // Ensure text remains visible
-    textShadow: "0 1px 1px rgba(0,0,0,0.5)", // Improve text readability
-    border: "1px solid rgba(0,0,0,0.2)", // Optional: add border for better visibility
-    position: "relative" // For pseudo-element if needed
-  }} className="btn btn-secondary" onClick={exportToExcel}>
-                 <b>  Export as Excel</b> 
+                <button 
+                  style={{
+                    backgroundColor: "rgb(182, 19, 25)",
+                    color: "white",
+                    fontWeight: "bold"
+                  }} 
+                  className="btn" 
+                  onClick={exportToExcel}
+                >
+                  Export as Excel
                 </button>
-
-
-
               </div>
             </div>
           </div>

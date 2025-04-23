@@ -74,7 +74,7 @@ a {
   background: #d1fae5;
   color: #065f46;
 }
-.status-badge.unregistered {
+.status-badge.un-registered {
   background: #fee2e2;
   color: #991b1b;
 }
@@ -98,7 +98,7 @@ a {
 
 .modal-header {
   border-bottom: none;
-  background: rgba(0,0,0,0.5);
+  /* background: rgba(0,0,0,0.5); */
   color: white;
 }
 
@@ -15978,7 +15978,12 @@ textarea.form-control-lg {
   background: var(--bs-primary-bg-subtle);
   color: var(--bs-primary);
 }
+.sidebar-nav ul .sidebar-item  .active {
+  background-color: grey;
+  color: white;
+} 
 .sidebar-nav ul .sidebar-item .sidebar-link {
+
   color: #2A3547;
   /* color: #2A3547; */
   display: flex;

@@ -191,8 +191,17 @@ const FacilityList: React.FC<FacilityListProps> = ({ status }) => {
                           </td>
                         )}
                         <td>
-                          <button className="btn btn-sm btn-primary">Edit</button>
-                          <button className="btn btn-sm btn-danger">Delete</button>
+                        <div style={{ display: "flex", gap: "8px" }}>
+
+                          <button className="btn btn-sm "   style={{
+        backgroundColor: "rgb(24, 80, 16)",
+        color: "white",
+      }}>Edit</button>
+                          <button className="btn btn-sm "  style={{
+        backgroundColor: "rgb(182, 19, 25)",
+        color: "white",
+      }}>Delete</button>
+                        </div>
                         </td>
                       </tr>
                     ))}

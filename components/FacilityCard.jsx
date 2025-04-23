@@ -109,7 +109,7 @@
 //               <option value="">All Statuses</option>
 //               <option value="Pending">Pending</option>
 //                       <option value="Registered">Registered</option>
-//                       <option value="UnRegistered">UnRegistered</option>
+//                       <option value="Un-Registered">Un-Registered</option>
 //                       <option value="Licensed">Licensed</option>
 //             </select>
 //           </div>
@@ -144,7 +144,7 @@
 //                     >
 //                       <option value="Pending">Pending</option>
 //                       <option value="Registered">Registered</option>
-//                       <option value="UnRegistered">UnRegistered</option>
+//                       <option value="Un-Registered">Un-Registered</option>
 //                       <option value="Licensed">Licensed</option>
 //                     </select>
 //                   </td>
@@ -298,7 +298,7 @@ const [showDentalModal, setShowDentalModal] = useState(false);
         ...doc.data(),
       }));
   
-      const allowedStatuses = ["Licensed", "Registered", "UnRegistered", "Pending"];
+      const allowedStatuses = ["Licensed", "Registered", "Un-Registered", "Pending"];
       const filteredFacilities = facilitiesData.filter((facility) => 
         allowedStatuses.includes(facility.status)
       );
@@ -359,8 +359,8 @@ const [showDentalModal, setShowDentalModal] = useState(false);
     if (newStatus === 'Licensed') {
       // Show license modal
       setShowLicenseModal(true);
-    } else if (currentStatus === 'Registered' || currentStatus === 'UnRegistered' || currentStatus === 'Pending') {
-      // Show confirmation modal for Registered/UnRegistered changes
+    } else if (currentStatus === 'Registered' || currentStatus === 'Un-Registered' || currentStatus === 'Pending') {
+      // Show confirmation modal for Registered/Un-Registered changes
       setShowConfirmModal(true);
     } else {
       // Direct update for other cases
@@ -489,7 +489,7 @@ const [showDentalModal, setShowDentalModal] = useState(false);
               <option value="">All Statuses</option>
               <option value="Pending">Pending</option>
               <option value="Registered">Registered</option>
-              <option value="UnRegistered">UnRegistered</option>
+              <option value="Un-Registered">Un-Registered</option>
               <option value="Licensed">Licensed</option>
             </select>
           </div>
@@ -530,31 +530,39 @@ const [showDentalModal, setShowDentalModal] = useState(false);
 >
   <option value="Pending">Pending</option>
   <option value="Registered">Registered</option>
-  <option value="UnRegistered">UnRegistered</option>
+  <option value="Un-Registered">Un-Registered</option>
   <option value="Licensed">Licensed</option>
 </select>
                   </td>
                   <td>
-                    <button className="btn btn-sm btn-success">Edit</button>
-                    <button 
-  className="btn btn-sm btn-danger"
-  style={{
-    backgroundImage: "url('/top_header.png')",
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    backgroundRepeat: "no-repeat",
-    color: "white", // Ensure text remains visible
-    textShadow: "0 1px 1px rgba(0,0,0,0.5)", // Improve text readability
-    border: "1px solid rgba(0,0,0,0.2)", // Optional: add border for better visibility
-    position: "relative" // For pseudo-element if needed
-  }}
->
-  Delete
-</button>
-                    <button className="btn btn-sm btn-info" onClick={() => handleShowDetailsModal(facility)}>
-                      Show Details
-                    </button>
-                  </td>
+  <div style={{ display: "flex", gap: "8px" }}>
+    <button
+      className="btn btn-sm"
+      style={{
+        backgroundColor: "rgb(24, 80, 16)",
+        color: "white",
+      }}
+    >
+      Edit
+    </button>
+    <button
+      className="btn btn-sm"
+      style={{
+        backgroundColor: "rgb(182, 19, 25)",
+        color: "white",
+      }}
+    >
+      Delete
+    </button>
+    <button
+      className="btn btn-sm btn-info"
+      onClick={() => handleShowDetailsModal(facility)}
+    >
+      Show Details
+    </button>
+  </div>
+</td>
+
                 </tr>
               ))}
             </tbody>
