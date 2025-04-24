@@ -107,10 +107,11 @@ export default function DashboardLayout({
               style={{ cursor: "pointer" }}
             /> */}
        <FaUserCircle 
-    size={50} 
+    size={40} 
     className="text-black" 
     style={{ 
         cursor: "pointer",
+        marginTop: "15px",
         backgroundColor: "#f0f0f0",  // Light grey color
         borderRadius: "50%",         // Makes background circular
         padding: "5px",             // Adds some space around the icon

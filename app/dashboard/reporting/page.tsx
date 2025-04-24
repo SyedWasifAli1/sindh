@@ -610,7 +610,8 @@ const formatTimestamp = (timestamp: TimestampType): string => {
       }
     },
     labels: Object.keys(filteredFacilityTypeCount),
-    colors: ['#008FFB', '#00E396', '#FEB019', '#FF4560', '#775DD0'],
+    // colors: ['#008FFB', '#00E396', '#FEB019', '#094208', '#775DD0','#696969'],
+    colors: [ '#094208','#696969','#b61319'],
     dataLabels: {
       formatter: function (val, opts) {
         return opts.w.config.series[opts.seriesIndex]; // 👈 count dikhata hai
@@ -636,7 +637,7 @@ const formatTimestamp = (timestamp: TimestampType): string => {
           <div className="row">
             <div className="col-lg-12">
               <div className="table-card">
-                <h5 className="card-title fw-semibold">Detailed Report</h5>
+                <h5 className="card-title fw-semibold mb-3">Detailed Report</h5>
                 <div className="table-responsive">
                   <table className="table table-striped">
                     <thead>
@@ -658,8 +659,8 @@ const formatTimestamp = (timestamp: TimestampType): string => {
                           <td>{facility.cityName || 'N/A'}</td>
                           <td>
                             <span className={`badge ${
-                              facility.status === 'Registered' ? 'bg-success' :
-                              facility.status === 'Licensed' ? 'bg-primary' :
+                              facility.status === 'Registered' ? 'custom-gray-bg' :
+                              facility.status === 'Licensed' ? 'custom-green-bg' :
                               facility.status === 'Pending' ? 'bg-warning' : 'custom-red-bg'
                             }`}>
                               {facility.status}
@@ -673,40 +674,55 @@ const formatTimestamp = (timestamp: TimestampType): string => {
                 </div>
                 {/* Pagination */}
                 <div className="d-flex justify-content-between align-items-center mt-3">
-                  <div>
-                    Showing {paginatedFacilities.length} of {filteredFacilities.length} facilities
-                  </div>
-                  <nav>
-                    <ul className="pagination">
-                      <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                        <button 
-                          className="page-link" 
-                          onClick={() => setCurrentPage(currentPage - 1)}
-                        >
-                          Previous
-                        </button>
-                      </li>
-                      {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                        <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
-                          <button 
-                            className="page-link" 
-                            onClick={() => setCurrentPage(page)}
-                          >
-                            {page}
-                          </button>
-                        </li>
-                      ))}
-                      <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                        <button 
-                          className="page-link" 
-                          onClick={() => setCurrentPage(currentPage + 1)}
-                        >
-                          Next
-                        </button>
-                      </li>
-                    </ul>
-                  </nav>
-                </div>
+  <div>
+    Showing {paginatedFacilities.length} of {filteredFacilities.length} facilities
+  </div>
+  <nav>
+    <ul className="pagination">
+      <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+        <button 
+          className="page-link" 
+          onClick={() => setCurrentPage(currentPage - 1)}
+          style={{
+            color: '#094208',
+            borderColor: '#094208'
+          }}
+        >
+          Previous
+        </button>
+      </li>
+      {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+        <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
+          <button 
+            className="page-link" 
+            onClick={() => setCurrentPage(page)}
+            style={{
+              // color: '#094208',
+              borderColor: '#094208',
+              backgroundColor: currentPage === page ? '#094208' : 'transparent',
+              color: currentPage === page ? 'white' : '#094208'
+            }}
+          >
+            {page}
+          </button>
+        </li>
+      ))}
+      <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+        <button 
+          className="page-link" 
+          onClick={() => setCurrentPage(currentPage + 1)}
+          style={{
+            color: '#094208',
+            borderColor: '#094208'
+          }}
+        >
+          Next
+        </button>
+      </li>
+    </ul>
+  </nav>
+</div>
+             
               </div>
             </div>
           </div>

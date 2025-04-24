@@ -555,11 +555,16 @@ const [showDentalModal, setShowDentalModal] = useState(false);
       Delete
     </button>
     <button
-      className="btn btn-sm btn-info"
-      onClick={() => handleShowDetailsModal(facility)}
-    >
-      Show Details
-    </button>
+  className="btn btn-sm"
+  onClick={() => handleShowDetailsModal(facility)}
+  style={{
+    backgroundColor: '#696969',
+    // borderColor: '#696969',
+    color: 'white' // White text for better contrast
+  }}
+>
+  Show Details
+</button>
   </div>
 </td>
 
