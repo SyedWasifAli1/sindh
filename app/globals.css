@@ -65,7 +65,12 @@ a {
 /* .custom-map .leaflet-control-attribution {
   display: none !important;
 } */
-
+.custom-red-bg{
+  background-color: #b61319;
+}
+.custom-red-text{
+  color: #b61319;
+}
 .status-badge.licensed {
   background: #e7f0b6;
   color: #8d853f;

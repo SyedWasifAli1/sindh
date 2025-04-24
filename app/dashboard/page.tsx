@@ -459,7 +459,7 @@ const Dashboard = () => {
       return acc;
     }, {} as Record<string, number>);
 
-    const allowedStatuses = ["Registered", "UnRegistered", "Licensed"];
+    const allowedStatuses = ["Un-Registered", "Registered", "Licensed"];
     const statusDataArray = allowedStatuses.map((status) => ({
       title: status,
       value: statusCounts[status] || 0,
@@ -515,8 +515,8 @@ const Dashboard = () => {
     switch (status) {
       case "Registered":
         return "#696969";       // Dark Blue
-      case "UnRegistered":
-        return "#e32417";       // Dark Red
+      case "Un-Registered":
+        return "#b61319";       // Dark Red
       case "Licensed":
         return "#006400";       // Dark Green
 
@@ -564,13 +564,16 @@ const Dashboard = () => {
                       let iconUrl = "";
                       switch (marker.status) {
                         case "Registered":
-                          iconUrl = "http://maps.google.com/mapfiles/ms/icons/green-dot.png";
+                          // iconUrl = "http://maps.google.com/mapfiles/ms/icons/green-dot.png";
+                          iconUrl = "/assets/images/logos/logo.png";
                           break;
                         case "UnRegistered":
-                          iconUrl = "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
+                          iconUrl = "/assets/images/logos/logo.png";
+                          // iconUrl = "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
                           break;
                         case "Licensed":
-                          iconUrl = "http://maps.google.com/mapfiles/ms/icons/blue-dot.png";
+                          iconUrl = "/assets/images/logos/logo.png";
+                          // iconUrl = "http://maps.google.com/mapfiles/ms/icons/blue-dot.png";
                           break;
                         default:
                           return null;
@@ -612,7 +615,7 @@ const Dashboard = () => {
                           <Line 
                             type="monotone" 
                             dataKey="value" 
-                            stroke="#4e73df" 
+                            stroke="#b61319" 
                             strokeWidth={2} 
                             dot={{ r: 4 }} 
                             activeDot={{ r: 6 }} 
@@ -677,8 +680,8 @@ const Dashboard = () => {
           </div>
 
           {/* Clinic Cards with Chart */}
-          <div className="col-lg-5">
-            <div className="card h-30">
+          <div className="col-lg-5 ">
+            <div className="card " style={{paddingBottom:""}}>
               <div className="card-body">
                 <h5 className="card-title fw-semibold mb-3">Clinic Types</h5>
                 <div className="row">
@@ -686,7 +689,7 @@ const Dashboard = () => {
                     const isPositiveTrend = clinic.trend >= 0;
                     return (
                       <div className="col-md-6 mb-3" key={idx}>
-                        <div className="card" style={{ height: "150px" }}>
+                        <div className="card" style={{ height: "186px" }}>
                           <div className="card-body d-flex flex-column justify-content-between">
                             <h6 className="fw-semibold text-truncate">{clinic.title}</h6>
                             <h6>{clinic.value}</h6>

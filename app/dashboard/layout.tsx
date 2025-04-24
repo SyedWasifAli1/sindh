@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import Sidebar from "../../components/Sidebar";
-import {  FaSignOutAlt,  } from "react-icons/fa";
+import {  FaSignOutAlt,  FaUserCircle,   } from "react-icons/fa";
 import { auth } from '../lib/firebase-config';
 import { signOut } from "firebase/auth";
 export default function DashboardLayout({
@@ -98,14 +98,24 @@ export default function DashboardLayout({
             className="bg-transparent border-0 mt-4"
             style={{ padding: 0 }}
           >
-            <Image
+            {/* <Image
               src="/assets/images/profile/user-1.jpg"
               alt="Profile"
               width={55}
               height={55}
               className="rounded-circle"
               style={{ cursor: "pointer" }}
-            />
+            /> */}
+       <FaUserCircle 
+    size={55} 
+    className="text-white" 
+    style={{ 
+        cursor: "pointer",
+        backgroundColor: "#f0f0f0",  // Light grey color
+        borderRadius: "50%",         // Makes background circular
+        padding: "5px",             // Adds some space around the icon
+    }}
+/>
           </button>
 
           {showDropdown && (

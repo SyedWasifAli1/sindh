@@ -528,10 +528,10 @@ const formatTimestamp = (timestamp: TimestampType): string => {
                   </div>
                   <div className="col-md-2 d-flex align-items-end">
                     <button 
-                      className="btn btn-primary w-100" 
+                      className="btn w-100" 
                       // onClick={}
                       style={{
-                        backgroundColor: "rgb(182, 19, 25)",
+                        backgroundColor: "custom-red-bg",
                         color: "white",
                         fontWeight: "bold"
                       }}
@@ -564,7 +564,7 @@ const formatTimestamp = (timestamp: TimestampType): string => {
                     yaxis: {
                       title: { text: "Number of Registrations" }
                     },
-                    colors: ['#008FFB'],
+                    colors: ['#b61319'],
                     plotOptions: {
                       bar: {
                         borderRadius: 4,
@@ -632,7 +632,7 @@ const formatTimestamp = (timestamp: TimestampType): string => {
                             <span className={`badge ${
                               facility.status === 'Registered' ? 'bg-success' :
                               facility.status === 'Licensed' ? 'bg-primary' :
-                              facility.status === 'Pending' ? 'bg-warning' : 'bg-danger'
+                              facility.status === 'Pending' ? 'bg-warning' : 'custom-red-bg'
                             }`}>
                               {facility.status}
                             </span>

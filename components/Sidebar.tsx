@@ -1,11 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
+// import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { signOut } from "firebase/auth";
 import { auth } from '../app/lib/firebase-config';
 import { useRouter } from "next/navigation";
+import { GrHomeRounded } from "react-icons/gr";
+import { MdOutlineSignalCellularAlt } from "react-icons/md";
+import { IoListSharp } from "react-icons/io5";
+import { FaAddressCard, FaIdBadge } from "react-icons/fa";
+import { CiStar } from "react-icons/ci";
+import { FiLogOut } from "react-icons/fi";
 
 export default function Sidebar() {
   const router = useRouter();
@@ -47,23 +53,27 @@ export default function Sidebar() {
                   paddingRight: '15px' // Space for the dot
                 }}
               >
-                <Image 
+                {/* <Image 
                   src="/Home.png"
                   alt="Dashboard"
                   width={15}
                   height={18}
                   className="me-2"
-                />
+                /> */}
+                <GrHomeRounded 
+  size={18}  // Matches your original image height
+  className="me-2"  // Same margin class as before
+/>
                 <span className="hide-menu">Dashboard</span>
                 {isActive('/dashboard') && (
                   <span 
                     style={{
                       position: 'absolute',
-                      right: 0,
+                      right: '10px',
                       top: '50%',
                       transform: 'translateY(-50%)',
-                      width: '6px',
-                      height: '6px',
+                      width: '10px',
+                      height: '10px',
                       backgroundColor: '#FF0000',
                       borderRadius: '50%'
                     }}
@@ -81,23 +91,25 @@ export default function Sidebar() {
                   paddingRight: '15px'
                 }}
               >
-                <Image 
+                {/* <Image 
                   src="/report.png"
                   alt="Reports"
                   width={15}
                   height={18}
                   className="me-2"
-                />
+                /> */}
+                <MdOutlineSignalCellularAlt size={18}  className="me-2" 
+    />
                 <span className="hide-menu">Reports</span>
                 {isActive('/dashboard/reporting') && (
                   <span 
                     style={{
                       position: 'absolute',
-                      right: 0,
+                      right: '10px',
                       top: '50%',
                       transform: 'translateY(-50%)',
-                      width: '6px',
-                      height: '6px',
+                      width: '10px',
+                      height: '10px',
                       backgroundColor: '#FF0000',
                       borderRadius: '50%'
                     }}
@@ -115,23 +127,24 @@ export default function Sidebar() {
                   paddingRight: '15px'
                 }}
               >
-                <Image 
+                {/* <Image 
                   src="/icon1.png"
                   alt="List"
                   width={15}
                   height={18}
                   className="me-2"
-                />
+                /> */}
+                <IoListSharp  size={18}  className="me-2" />
                 <span className="hide-menu">List of Facility</span>
                 {isActive('/dashboard/list-of-facility') && (
                   <span 
                     style={{
                       position: 'absolute',
-                      right: 0,
+                      right: '10px',
                       top: '50%',
                       transform: 'translateY(-50%)',
-                      width: '6px',
-                      height: '6px',
+                      width: '10px',
+                      height: '10px',
                       backgroundColor: '#FF0000',
                       borderRadius: '50%'
                     }}
@@ -149,23 +162,24 @@ export default function Sidebar() {
                   paddingRight: '15px'
                 }}
               >
-                <Image 
+                {/* <Image 
                   src="/unregister.png"
                   alt="Un-Registered"
                   width={15}
                   height={18}
                   className="me-2"
-                />
+                /> */}
+                <FaIdBadge  size={18}  className="me-2"/>
                 <span className="hide-menu">Un-Registered</span>
                 {isActive('/dashboard/Un-Registered') && (
                   <span 
                     style={{
                       position: 'absolute',
-                      right: 0,
+                      right: '10px',
                       top: '50%',
                       transform: 'translateY(-50%)',
-                      width: '6px',
-                      height: '6px',
+                      width: '10px',
+                      height: '10px',
                       backgroundColor: '#FF0000',
                       borderRadius: '50%'
                     }}
@@ -183,23 +197,24 @@ export default function Sidebar() {
                   paddingRight: '15px'
                 }}
               >
-                <Image 
+                {/* <Image 
                   src="/vector1.png"
                   alt="Registered"
                   width={15}
                   height={18}
                   className="me-2"
-                />
+                /> */}
+                <FaAddressCard size={18}  className="me-2"/>
                 <span className="hide-menu">Registered</span>
                 {isActive('/dashboard/registered') && (
                   <span 
                     style={{
                       position: 'absolute',
-                      right: 0,
+                      right: '10px',
                       top: '50%',
                       transform: 'translateY(-50%)',
-                      width: '6px',
-                      height: '6px',
+                      width: '10px',
+                      height: '10px',
                       backgroundColor: '#FF0000',
                       borderRadius: '50%'
                     }}
@@ -217,23 +232,24 @@ export default function Sidebar() {
                   paddingRight: '15px'
                 }}
               >
-                <Image 
+                {/* <Image 
                   src="/Star.png"
                   alt="Licensed"
                   width={15}
                   height={18}
                   className="me-2"
-                />
+                /> */}
+                <CiStar size={18}  className="me-2" />
                 <span className="hide-menu">licensed</span>
                 {isActive('/dashboard/licensed') && (
                   <span 
                     style={{
                       position: 'absolute',
-                      right: 0,
+                      right: '10px',
                       top: '50%',
                       transform: 'translateY(-50%)',
-                      width: '6px',
-                      height: '6px',
+                      width: '10px',
+                      height: '10px',
                       backgroundColor: '#FF0000',
                       borderRadius: '50%'
                     }}
@@ -250,13 +266,14 @@ export default function Sidebar() {
                   position: 'relative'
                 }}
               >
-                <Image 
+                {/* <Image 
                   src="/logout.png"
                   alt="Signout"
                   width={15}
                   height={18}
                   className="me-2"
-                />
+                /> */}
+                <FiLogOut size={18}  className="me-2" />
                 <span className="hide-menu">Signout</span>
               </button>
             </li>
