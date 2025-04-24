@@ -657,7 +657,7 @@ const [showDentalModal, setShowDentalModal] = useState(false);
                   </div>
                 </div>
                 <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary" onClick={handleCloseModals}>Close</button>
+                  <button type="button" className="btn  " style={{backgroundColor:'#b61319' ,color:'white'}} onClick={handleCloseModals}>Close</button>
                 </div>
               </div>
             </div>
@@ -758,7 +758,7 @@ const [showDentalModal, setShowDentalModal] = useState(false);
                   </div> }
                 </div>
                 <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary" onClick={handleCloseModals}>Close</button>
+                <button type="button" className="btn  " style={{backgroundColor:'#b61319' ,color:'white'}} onClick={handleCloseModals}>Close</button>
                 </div>
               </div>
             </div>
@@ -859,7 +859,7 @@ const [showDentalModal, setShowDentalModal] = useState(false);
                   </div> }
                 </div>
                 <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary" onClick={handleCloseModals}>Close</button>
+                <button type="button" className="btn  " style={{backgroundColor:'#b61319' ,color:'white'}} onClick={handleCloseModals}>Close</button>
                 </div>
               </div>
             </div>
@@ -1061,7 +1061,7 @@ const [showDentalModal, setShowDentalModal] = useState(false);
                   </div> }
                 </div>
                 <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary" onClick={handleCloseModals}>Close</button>
+                <button type="button" className="btn  " style={{backgroundColor:'#b61319' ,color:'white'}} onClick={handleCloseModals}>Close</button>
                 </div>
               </div>
             </div>
@@ -1162,7 +1162,7 @@ const [showDentalModal, setShowDentalModal] = useState(false);
                   </div> }
                 </div>
                 <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary" onClick={handleCloseModals}>Close</button>
+                <button type="button" className="btn  " style={{backgroundColor:'#b61319' ,color:'white'}} onClick={handleCloseModals}>Close</button>
                 </div>
               </div>
             </div>
@@ -1182,7 +1182,7 @@ const [showDentalModal, setShowDentalModal] = useState(false);
                   <p>Are you sure you want to change the status of <strong>{selectedFacility?.privateOwner}</strong> from <strong>{selectedFacility?.status}</strong> to <strong>{newStatus}</strong>?</p>
                 </div>
                 <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary" onClick={handleCloseModals}>Cancel</button>
+                  <button type="button" className="btn " style={{backgroundColor:'#b61319',color:'white'}} onClick={handleCloseModals}>Cancel</button>
                   <button 
                     type="button" 
                     className="btn btn-primary"
@@ -1239,7 +1239,7 @@ const [showDentalModal, setShowDentalModal] = useState(false);
                   </div>
                 </div>
                 <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary" onClick={handleCloseModals}>Cancel</button>
+                  <button type="button" className="btn " style={{color:'white',backgroundColor:'#b61319'}} onClick={handleCloseModals}>Cancel</button>
                   <button 
                     type="button" 
                     className="btn btn-primary"

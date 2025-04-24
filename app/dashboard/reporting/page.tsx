@@ -531,7 +531,7 @@ const formatTimestamp = (timestamp: TimestampType): string => {
                       className="btn w-100" 
                       // onClick={}
                       style={{
-                        backgroundColor: "custom-red-bg",
+                        backgroundColor: "#b61319",
                         color: "white",
                         fontWeight: "bold"
                       }}
@@ -585,7 +585,7 @@ const formatTimestamp = (timestamp: TimestampType): string => {
             <div className="col-lg-6">
               <div className="chart-card">
                 <h5 className="card-title fw-semibold">Facility Types</h5>
-                <Chart
+                {/* <Chart
                   options={{ 
                     chart: { 
                       id: "facility-chart",
@@ -599,7 +599,35 @@ const formatTimestamp = (timestamp: TimestampType): string => {
                   series={Object.values(filteredFacilityTypeCount)}
                   type="pie"
                   height={300}
-                />
+                /> */}
+
+<Chart
+  options={{ 
+    chart: { 
+      id: "facility-chart",
+      toolbar: {
+        show: true
+      }
+    },
+    labels: Object.keys(filteredFacilityTypeCount),
+    colors: ['#008FFB', '#00E396', '#FEB019', '#FF4560', '#775DD0'],
+    dataLabels: {
+      formatter: function (val, opts) {
+        return opts.w.config.series[opts.seriesIndex]; // 👈 count dikhata hai
+      }
+    },
+    legend: {
+      formatter: function(seriesName, opts) {
+        const count = opts.w.globals.series[opts.seriesIndex];
+        return `${seriesName}: ${count}`; // 👈 legend me bhi count dikhayega
+      }
+    }
+  }}
+  series={Object.values(filteredFacilityTypeCount)}
+  type="pie"
+  height={300}
+/>
+
               </div>
             </div>
           </div>
