@@ -610,17 +610,20 @@ const formatTimestamp = (timestamp: TimestampType): string => {
       }
     },
     labels: Object.keys(filteredFacilityTypeCount),
-    // colors: ['#008FFB', '#00E396', '#FEB019', '#094208', '#775DD0','#696969'],
-    colors: [ '#094208','#696969','#b61319'],
+    colors: ['#094208', '#696969', '#b61319'],
     dataLabels: {
       formatter: function (val, opts) {
-        return opts.w.config.series[opts.seriesIndex]; // 👈 count dikhata hai
+        return opts.w.config.series[opts.seriesIndex];
       }
     },
     legend: {
       formatter: function(seriesName, opts) {
         const count = opts.w.globals.series[opts.seriesIndex];
-        return `${seriesName}: ${count}`; // 👈 legend me bhi count dikhayega
+        return `${seriesName}: ${count}`;
+      },
+      itemMargin: {
+        vertical: 7, // 👈 yeh har label ke niche 10px ka gap daal dega
+        horizontal: 0
       }
     }
   }}
@@ -628,6 +631,8 @@ const formatTimestamp = (timestamp: TimestampType): string => {
   type="pie"
   height={300}
 />
+
+
 
               </div>
             </div>
