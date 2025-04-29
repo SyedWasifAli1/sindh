@@ -167,7 +167,7 @@ export default function DashboardLayout({
               <li>
                 <button
                   onClick={handleLogout}
-                  className="dropdown-item d-flex align-items-center gap-2 text-danger border-0 bg-transparent w-100 text-start"
+                  className="dropdown-item d-flex align-items-center gap-2 text-black border-0 bg-transparent w-100 text-start"
                 >
                   <FaSignOutAlt className="fs-6" />
                   <span>Logout</span>

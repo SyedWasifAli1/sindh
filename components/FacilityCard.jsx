@@ -416,6 +416,18 @@ const [showDentalModal, setShowDentalModal] = useState(false);
   //   setSelectedFacility(facility);
   //   setShowDetailsModal(true);
   // };
+  const handleDeleteFacility = async (facilityId) => {
+    try {
+      const facilityRef = doc(firestore, 'facility_selections', facilityId);
+      await deleteDoc(firestore, facilityRef);
+      // Optional: Show success message
+      alert('Facility deleted successfully');
+    } catch (error) {
+      console.error("Error deleting facility: ", error);
+      // Optional: Show error message
+      alert('Error deleting facility');
+    }
+  };
 
   const handleShowDetailsModal = (facility) => {
     setSelectedFacility(facility);
@@ -487,7 +499,7 @@ const [showDentalModal, setShowDentalModal] = useState(false);
             <label htmlFor="statusFilter" className="form-label">Filter by Status</label>
             <select className="form-select" id="statusFilter" onChange={filterFacilities}>
               <option value="">All Statuses</option>
-              <option value="Pending">Pending</option>
+              {/* <option value="Pending">Pending</option> */}
               <option value="Registered">Registered</option>
               <option value="Un-Registered">Un-Registered</option>
               <option value="Licensed">Licensed</option>

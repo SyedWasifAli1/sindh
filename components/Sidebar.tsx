@@ -240,7 +240,7 @@ export default function Sidebar() {
                   className="me-2"
                 /> */}
                 <CiStar size={18}  className="me-2" />
-                <span className="hide-menu">licensed</span>
+                <span className="hide-menu">Licensed</span>
                 {isActive('/dashboard/licensed') && (
                   <span 
                     style={{
@@ -274,7 +274,7 @@ export default function Sidebar() {
                   className="me-2"
                 /> */}
                 <FiLogOut size={18}  className="me-2" />
-                <span className="hide-menu">Signout</span>
+                <span className="hide-menu">Sign out</span>
               </button>
             </li>
           </ul>

@@ -370,6 +370,8 @@ import {
   Line,
   ResponsiveContainer,
   Tooltip,
+  YAxis,
+  XAxis,
 } from "recharts";
 
 interface Facility {
@@ -609,19 +611,26 @@ const Dashboard = () => {
                   <div className="card-body">
                     <h5 className="card-title fw-semibold">Monthly Registrations</h5>
                     <div style={{ height: "200px" }}>
-                      <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={registrationChartData}>
-                          <Tooltip />
-                          <Line 
-                            type="monotone" 
-                            dataKey="value" 
-                            stroke="#b61319" 
-                            strokeWidth={2} 
-                            dot={{ r: 4 }} 
-                            activeDot={{ r: 6 }} 
-                          />
-                        </LineChart>
-                      </ResponsiveContainer>
+                    <ResponsiveContainer width="100%" height="100%">
+  <LineChart data={registrationChartData}>
+    <XAxis 
+      dataKey="name"  // assuming your data has a "name" property for X-axis
+      tick={{ fill: '#666', fontSize: 12 }}  // optional styling
+    />
+    <YAxis 
+      tick={{ fill: '#666', fontSize: 12 }}  // optional styling
+    />
+    <Tooltip />
+    <Line 
+      type="monotone" 
+      dataKey="value" 
+      stroke="#b61319" 
+      strokeWidth={2} 
+      dot={{ r: 4 }} 
+      activeDot={{ r: 6 }} 
+    />
+  </LineChart>
+</ResponsiveContainer>
                     </div>
                   </div>
                 </div>
@@ -704,17 +713,27 @@ const Dashboard = () => {
                               </p>
                             </div>
                             <ResponsiveContainer width="100%" height={40}>
-                              <LineChart data={registrationChartData.slice(0, 4)}>
-                                <Tooltip />
-                                <Line 
-                                  type="monotone" 
-                                  dataKey="value" 
-                                  stroke={isPositiveTrend ? "#28a745" : "#dc3545"} 
-                                  strokeWidth={2} 
-                                  dot={false} 
-                                />
-                              </LineChart>
-                            </ResponsiveContainer>
+  <LineChart data={registrationChartData.slice(0, 4)}>
+    <XAxis 
+      dataKey="name"  // अपने data के अनुसार key adjust करें
+      tick={{ fontSize: 10 }}  // छोटा font size
+      height={12}  // axis का height कम करें
+    />
+    <YAxis 
+      width={20}  // axis का width कम करें
+      tick={{ fontSize: 10 }}  // छोटा font size
+      tickCount={3}  // limited ticks
+    />
+    <Tooltip />
+    <Line 
+      type="monotone" 
+      dataKey="value" 
+      stroke={isPositiveTrend ? "#28a745" : "#dc3545"} 
+      strokeWidth={2} 
+      dot={false} 
+    />
+  </LineChart>
+</ResponsiveContainer>
                           </div>
                         </div>
                       </div>
