@@ -265,9 +265,9 @@
 // export default FacilityCard;
 
 
-import React, { useState, useEffect } from 'react';
-import { firestore, collection, doc, updateDoc, onSnapshot } from '../app/lib/firebase-config';
 
+import React, { useState, useEffect } from 'react';
+import { firestore, collection, doc, updateDoc, onSnapshot, deleteDoc } from '../app/lib/firebase-config';
 const FacilityCard = () => {
   const [city, setCity] = useState([]);
   const [facilities, setFacilities] = useState([]);
@@ -417,15 +417,21 @@ const [showDentalModal, setShowDentalModal] = useState(false);
   //   setShowDetailsModal(true);
   // };
   const handleDeleteFacility = async (facilityId) => {
+    if (!window.confirm('Are you sure you want to delete this facility?')) {
+      return;
+    }
+    
     try {
-      const facilityRef = doc(firestore, 'facility_selections', facilityId);
-      await deleteDoc(firestore, facilityRef);
-      // Optional: Show success message
-      alert('Facility deleted successfully');
+      const facilityToDelete = facilities.find(f => f.id === facilityId);
+      
+      if (facilityToDelete) {
+        await deleteDoc(doc(firestore, "facility_selections", facilityId));
+        setFacilities(facilities.filter(f => f.id !== facilityId));
+        alert('Facility successfully deleted');
+      }
     } catch (error) {
-      console.error("Error deleting facility: ", error);
-      // Optional: Show error message
-      alert('Error deleting facility');
+      console.error("Error deleting facility:", error);
+      alert(`Error deleting facility: ${error.message}`);
     }
   };
 
@@ -557,7 +563,7 @@ const [showDentalModal, setShowDentalModal] = useState(false);
     >
       Edit
     </button>
-    <button
+    {/* <button
       className="btn btn-sm"
       style={{
         backgroundColor: "rgb(182, 19, 25)",
@@ -566,6 +572,18 @@ const [showDentalModal, setShowDentalModal] = useState(false);
     >
       Delete
     </button>
+     */}
+
+<button
+  className="btn btn-sm"
+  style={{
+    backgroundColor: "rgb(182, 19, 25)",
+    color: "white",
+  }}
+  onClick={() => handleDeleteFacility(facility.id)}
+>
+  Delete
+</button>
     <button
   className="btn btn-sm"
   onClick={() => handleShowDetailsModal(facility)}
