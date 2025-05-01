@@ -145,16 +145,16 @@
 
 //     );
 // }
-
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { firestore, collection, onSnapshot } from "../../lib/firebase-config";
 import { format, getMonth } from 'date-fns';
 import * as XLSX from 'xlsx';
-// import { jsPDF } from 'jspdf';
+import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import { Timestamp } from "firebase/firestore";
+import html2canvas from 'html2canvas';
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
@@ -193,6 +193,11 @@ const Reports = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
+  // Refs for the charts
+  const monthlyRegistrationsRef = useRef<HTMLDivElement>(null);
+  const facilityTypesRef = useRef<HTMLDivElement>(null);
+  const chartsRowRef = useRef(null);
+
   useEffect(() => {
     const facilitiesRef = collection(firestore, 'facility_selections');
   
@@ -220,114 +225,24 @@ const Reports = () => {
     setCurrentPage(1);
   };
 
-  // const handleGenerateReport = async () => {
-  //   try {
-  //     const doc = new jsPDF();
-      
-  //     // Add title with filters
-  //     doc.setFontSize(16);
-  //     doc.setTextColor(40);
-  //     doc.text('Facilities Report', 105, 15, { align: 'center' });
-      
-  //     doc.setFontSize(10);
-  //     doc.text(`Filters: ${getAppliedFiltersText()}`, 105, 22, { align: 'center' });
-      
-  //     // Add charts
-  //     const chart1Container = document.querySelector('#registrations-chart');
-  //     const chart2Container = document.querySelector('#facility-chart');
-      
-  //     if (chart1Container && chart2Container) {
-  //       const chart1SVG = chart1Container.querySelector('svg');
-  //       const chart2SVG = chart2Container.querySelector('svg');
-        
-  //       if (chart1SVG && chart2SVG) {
-  //         // Convert SVGs to canvas
-  //         const chart1Canvas = await svgToCanvas(chart1SVG);
-  //         const chart2Canvas = await svgToCanvas(chart2SVG);
-          
-  //         // Add first chart
-  //         doc.addImage(chart1Canvas.toDataURL('image/png'), 'PNG', 15, 30, 180, 90);
-          
-  //         // Add second chart
-  //         doc.addImage(chart2Canvas.toDataURL('image/png'), 'PNG', 15, 130, 180, 90);
-  //       }
-  //     }
-      
-  //     // Add table
-  //     const headers = [['Owner', 'Facility Name', 'Facility Type', 'City', 'Status', 'Registration Date']];
-  //     const data = filteredFacilities.map(facility => [
-  //       facility.privateOwner || 'N/A',
-  //       facility.clinicName || 'N/A',
-  //       facility.clinictype || 'N/A',
-  //       facility.cityName || 'N/A',
-  //       facility.status || 'N/A',
-  //       formatTimestamp(facility.createdDate)
-  //     ]);
-
-  //     (doc as any).autoTable({
-  //       head: headers,
-  //       body: data,
-  //       startY: 230,
-  //       styles: { fontSize: 8 },
-  //       headStyles: { fillColor: [182, 19, 25] },
-  //       margin: { top: 230 }
-  //     });
-
-  //     doc.save(`facilities_report_${new Date().toISOString().slice(0, 10)}.pdf`);
-  //   } catch (error) {
-  //     console.error('Error generating PDF:', error);
-  //     alert('Error generating PDF report. Please try again.');
-  //   }
-  // };
-
-  // const svgToCanvas = async (svg: SVGElement): Promise<HTMLCanvasElement> => {
-  //   return new Promise((resolve) => {
-  //     const canvas = document.createElement('canvas');
-  //     const ctx = canvas.getContext('2d')!;
-  //     const data = new XMLSerializer().serializeToString(svg);
-  //     const img = new Image();
-      
-  //     img.onload = () => {
-  //       canvas.width = img.width;
-  //       canvas.height = img.height;
-  //       ctx.drawImage(img, 0, 0);
-  //       resolve(canvas);
-  //     };
-      
-  //     img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(data)));
-  //   });
-  // };
-
-  // const getAppliedFiltersText = () => {
-  //   const filtersText = [];
-  //   if (filters.startDate) filtersText.push(`From: ${format(new Date(filters.startDate), 'MMM dd, yyyy')}`);
-  //   if (filters.endDate) filtersText.push(`To: ${format(new Date(filters.endDate), 'MMM dd, yyyy')}`);
-  //   if (filters.city) filtersText.push(`City: ${filters.city}`);
-  //   if (filters.status) filtersText.push(`Status: ${filters.status}`);
-  //   if (filters.clinicType) filtersText.push(`Clinic Type: ${filters.clinicType}`);
-    
-  //   return filtersText.length > 0 ? filtersText.join(' | ') : 'All Filters';
-  // };
-
   type TimestampType = string | number | { seconds: number } | undefined;
 
-const formatTimestamp = (timestamp: TimestampType): string => {
-  if (!timestamp) return 'N/A';
+  const formatTimestamp = (timestamp: TimestampType): string => {
+    if (!timestamp) return 'N/A';
 
-  try {
-    if (typeof timestamp === 'object' && 'seconds' in timestamp) {
-      return format(new Date(timestamp.seconds * 1000), 'MMM dd, yyyy');
+    try {
+      if (typeof timestamp === 'object' && 'seconds' in timestamp) {
+        return format(new Date(timestamp.seconds * 1000), 'MMM dd, yyyy');
+      }
+      if (typeof timestamp === 'string' || typeof timestamp === 'number') {
+        return format(new Date(timestamp), 'MMM dd, yyyy');
+      }
+      return 'N/A';
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return 'N/A';
     }
-    if (typeof timestamp === 'string' || typeof timestamp === 'number') {
-      return format(new Date(timestamp), 'MMM dd, yyyy');
-    }
-    return 'N/A';
-  } catch (error) {
-    console.error('Error formatting date:', error);
-    return 'N/A';
-  }
-};
-
+  };
 
   const getMonthName = (monthIndex: number) => {
     const months = [
@@ -377,6 +292,82 @@ const formatTimestamp = (timestamp: TimestampType): string => {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Facilities");
     XLSX.writeFile(workbook, "facilities_report.xlsx");
+  };
+
+  const generatePDF = async () => {
+    setLoading(true);
+    const pdf = new jsPDF('p', 'mm', 'a4'); 
+    
+    // Add title
+    pdf.setFontSize(20);
+    pdf.setTextColor(40);
+    pdf.text('Report', 105, 15, { align: 'center' });
+    
+    // Add date
+    pdf.setFontSize(12);
+    pdf.text(`Generated on: ${format(new Date(), 'MMM dd, yyyy')}`, 105, 22, { align: 'center' });
+    
+    // Add filters info
+    pdf.setFontSize(10);
+    // let filtersText = 'Filters: ';
+    // if (filters.startDate) filtersText += `From ${format(new Date(filters.startDate), 'MMM dd, yyyy')} `;
+    // if (filters.endDate) filtersText += `To ${format(new Date(filters.endDate), 'MMM dd, yyyy')} `;
+    // if (filters.city) filtersText += `City: ${filters.city} `;
+    // if (filters.status) filtersText += `Status: ${filters.status} `;
+    // if (filters.clinicType) filtersText += `Type: ${filters.clinicType}`;
+    
+    // pdf.text(filtersText, 14, 30);
+    
+    let yPosition = 40;
+    
+    try {
+      // Capture Monthly Registrations chart
+      if (chartsRowRef.current ) {
+        const canvas = await html2canvas(chartsRowRef.current, {
+          scale: 2, // Higher quality
+          logging: true,
+          useCORS: true
+        });
+        const imgData = canvas.toDataURL('image/png');
+        
+        // Add chart title
+        pdf.setFontSize(14);
+        // pdf.text('Monthly Registrations', 14, yPosition);
+        yPosition += 10;
+        
+        // Add chart image (smaller width to fit better)
+        pdf.addImage(imgData, 'PNG', 14, yPosition, 180, 80);
+        yPosition += 90;
+      }
+      
+      // Capture Facility Types chart
+      if (facilityTypesRef.current) {
+        console.log('Capturing facilityTypesRef...'); // 🔍 Debug log
+        await new Promise((resolve) => setTimeout(resolve, 500)); // Optional delay
+      
+        const canvas = await html2canvas(facilityTypesRef.current, {
+          scale: 2,
+          logging: true,
+          useCORS: true
+        });
+        const imgData = canvas.toDataURL('image/png');
+      
+        pdf.setFontSize(14);
+        pdf.text('Facility Types Distribution', 14, yPosition);
+        yPosition += 10;
+      
+        pdf.addImage(imgData, 'PNG', 14, yPosition, 180, 80);
+        yPosition += 90;
+      }
+      
+      
+      // Save the PDF
+      pdf.save('facilities_report.pdf');
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (loading) {
@@ -529,7 +520,7 @@ const formatTimestamp = (timestamp: TimestampType): string => {
                   <div className="col-md-2 d-flex align-items-end">
                     <button 
                       className="btn w-100" 
-                      // onClick={}
+                      onClick={generatePDF}
                       style={{
                         backgroundColor: "#b61319",
                         color: "white",
@@ -544,9 +535,9 @@ const formatTimestamp = (timestamp: TimestampType): string => {
             </div>
           </div>
 
-          {/* Charts */}
-          <div className="row pt-3">
-            <div className="col-lg-6">
+          {/* Charts with refs */}
+          <div className="row pt-3" ref={chartsRowRef}>
+            <div className="col-lg-6" ref={monthlyRegistrationsRef}>
               <div className="chart-card">
                 <h5 className="card-title fw-semibold">Monthly Registrations</h5>
                 <Chart
@@ -582,58 +573,39 @@ const formatTimestamp = (timestamp: TimestampType): string => {
                 />
               </div>
             </div>
-            <div className="col-lg-6">
+            <div className="col-lg-6" ref={facilityTypesRef}>
               <div className="chart-card">
                 <h5 className="card-title fw-semibold">Facility Types</h5>
-                {/* <Chart
+                <Chart
                   options={{ 
                     chart: { 
                       id: "facility-chart",
                       toolbar: {
                         show: true
                       }
-                    }, 
+                    },
                     labels: Object.keys(filteredFacilityTypeCount),
-                    colors: ['#008FFB', '#00E396', '#FEB019', '#FF4560', '#775DD0']
+                    colors: ['#094208', '#696969', '#b61319'],
+                    dataLabels: {
+                      formatter: function (val, opts) {
+                        return opts.w.config.series[opts.seriesIndex];
+                      }
+                    },
+                    legend: {
+                      formatter: function(seriesName, opts) {
+                        const count = opts.w.globals.series[opts.seriesIndex];
+                        return `${seriesName}: ${count}`;
+                      },
+                      itemMargin: {
+                        vertical: 7,
+                        horizontal: 0
+                      }
+                    }
                   }}
                   series={Object.values(filteredFacilityTypeCount)}
                   type="pie"
                   height={300}
-                /> */}
-
-<Chart
-  options={{ 
-    chart: { 
-      id: "facility-chart",
-      toolbar: {
-        show: true
-      }
-    },
-    labels: Object.keys(filteredFacilityTypeCount),
-    colors: ['#094208', '#696969', '#b61319'],
-    dataLabels: {
-      formatter: function (val, opts) {
-        return opts.w.config.series[opts.seriesIndex];
-      }
-    },
-    legend: {
-      formatter: function(seriesName, opts) {
-        const count = opts.w.globals.series[opts.seriesIndex];
-        return `${seriesName}: ${count}`;
-      },
-      itemMargin: {
-        vertical: 7, // 👈 yeh har label ke niche 10px ka gap daal dega
-        horizontal: 0
-      }
-    }
-  }}
-  series={Object.values(filteredFacilityTypeCount)}
-  type="pie"
-  height={300}
-/>
-
-
-
+                />
               </div>
             </div>
           </div>
@@ -679,55 +651,53 @@ const formatTimestamp = (timestamp: TimestampType): string => {
                 </div>
                 {/* Pagination */}
                 <div className="d-flex justify-content-between align-items-center mt-3">
-  <div>
-    Showing {paginatedFacilities.length} of {filteredFacilities.length} facilities
-  </div>
-  <nav>
-    <ul className="pagination">
-      <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-        <button 
-          className="page-link" 
-          onClick={() => setCurrentPage(currentPage - 1)}
-          style={{
-            color: '#094208',
-            borderColor: '#094208'
-          }}
-        >
-          Previous
-        </button>
-      </li>
-      {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-        <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
-          <button 
-            className="page-link" 
-            onClick={() => setCurrentPage(page)}
-            style={{
-              // color: '#094208',
-              borderColor: '#094208',
-              backgroundColor: currentPage === page ? '#094208' : 'transparent',
-              color: currentPage === page ? 'white' : '#094208'
-            }}
-          >
-            {page}
-          </button>
-        </li>
-      ))}
-      <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-        <button 
-          className="page-link" 
-          onClick={() => setCurrentPage(currentPage + 1)}
-          style={{
-            color: '#094208',
-            borderColor: '#094208'
-          }}
-        >
-          Next
-        </button>
-      </li>
-    </ul>
-  </nav>
-</div>
-             
+                  <div>
+                    Showing {paginatedFacilities.length} of {filteredFacilities.length} facilities
+                  </div>
+                  <nav>
+                    <ul className="pagination">
+                      <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                        <button 
+                          className="page-link" 
+                          onClick={() => setCurrentPage(currentPage - 1)}
+                          style={{
+                            color: '#094208',
+                            borderColor: '#094208'
+                          }}
+                        >
+                          Previous
+                        </button>
+                      </li>
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                        <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
+                          <button 
+                            className="page-link" 
+                            onClick={() => setCurrentPage(page)}
+                            style={{
+                              borderColor: '#094208',
+                              backgroundColor: currentPage === page ? '#094208' : 'transparent',
+                              color: currentPage === page ? 'white' : '#094208'
+                            }}
+                          >
+                            {page}
+                          </button>
+                        </li>
+                      ))}
+                      <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                        <button 
+                          className="page-link" 
+                          onClick={() => setCurrentPage(currentPage + 1)}
+                          style={{
+                            color: '#094208',
+                            borderColor: '#094208'
+                          }}
+                        >
+                          Next
+                        </button>
+                      </li>
+                    </ul>
+                  </nav>
+                </div>
               </div>
             </div>
           </div>
