@@ -347,7 +347,6 @@
 
 // export default Dashboard;
 
-
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -359,12 +358,7 @@ import {
 } from "@react-google-maps/api";
 import { collection, onSnapshot } from "firebase/firestore";
 import { firestore } from "../lib/firebase-config";
-import {
-  // FaChartLine,
-  // FaCalendarAlt,
-  FaArrowUp,
-  FaArrowDown,
-} from "react-icons/fa";
+import { FaArrowUp, FaArrowDown } from "react-icons/fa";
 import {
   LineChart,
   Line,
@@ -382,27 +376,62 @@ interface Facility {
   longitude: number;
   clinicName: string;
   clinicType: string;
-  createdAt?: { seconds: number }; // Add this if your data has timestamps
+  createdDate?: { seconds: number; nanoseconds: number }; // Updated to match Firestore timestamp
 }
 
-interface ChartData {
-  name: string;
+// interface ChartData {
+//   name: string;
+//   value: number;
+// }
+
+interface ClinicData {
+  title: string;
+  value: number;
+  trend: number;
+}
+
+interface StatusData {
+  title: string;
   value: number;
 }
 
 const Dashboard = () => {
   const [markers, setMarkers] = useState<Facility[]>([]);
   const [selectedMarker, setSelectedMarker] = useState<Facility | null>(null);
-  // const [selectedCity, setSelectedCity] = useState("");
-  const [clinicData, setClinicData] = useState<{ title: string; value: number; trend: number }[]>([]);
-  const [statusData, setStatusData] = useState<{ title: string; value: number }[]>([]);
-  // const [yearlyData, setYearlyData] = useState<{ total: number; trend: number }>({ total: 0, trend: 0 });
-  // const [monthlyData, setMonthlyData] = useState<{ total: number; trend: number }>({ total: 0, trend: 0 });
-  const [registrationChartData, setRegistrationChartData] = useState<ChartData[]>([]);
+  const [clinicData, setClinicData] = useState<ClinicData[]>([]);
+  const [statusData, setStatusData] = useState<StatusData[]>([]);
+  // const [registrationChartData, setRegistrationChartData] = useState<ChartData[]>([]);
   
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
   });
+  const getRegistrationChartData = () => {
+    const monthCounts = Array(12).fill(0);
+    const currentYear = new Date().getFullYear();
+    
+    markers.forEach(facility => {
+      let date: Date | null = null;
+      
+      if (facility.createdDate?.seconds) {
+        date = new Date(facility.createdDate.seconds * 1000);
+      } else if (typeof facility.createdDate === 'string') {
+        date = new Date(facility.createdDate);
+      } else if (typeof facility.createdDate === 'number') {
+        date = new Date(facility.createdDate);
+      }
+      
+      if (date && date.getFullYear() === currentYear) {
+        const month = date.getMonth();
+        monthCounts[month]++;
+      }
+    });
+    
+    return Array.from({ length: 12 }, (_, i) => ({
+      name: `${new Date(currentYear, i, 1).toLocaleString('default', { month: 'short' })} '${currentYear.toString().slice(2)}`,
+      value: monthCounts[i]
+    }));
+  };
+  const registrationChartData = getRegistrationChartData();
 
   useEffect(() => {
     const facilitiesRef = collection(firestore, "facility_selections");
@@ -416,7 +445,7 @@ const Dashboard = () => {
         longitude: doc.data().longitude,
         clinicName: doc.data().privateOwner,
         clinicType: doc.data().clinictype,
-        createdAt: doc.data().createdAt // Assuming you have timestamp field
+        createdDate: doc.data().createdDate // This should be a Firestore timestamp
       })) as Facility[];
 
       setMarkers(facilitiesData);
@@ -444,12 +473,41 @@ const Dashboard = () => {
       "Dental Clinic",
     ];
 
-    // Calculate trends for each clinic type (random for demo, replace with actual data)
-    const clinicDataArray = allowedClinics.map((clinicType) => ({
-      title: clinicType,
-      value: clinicCounts[clinicType] || 0,
-      trend: Math.floor(Math.random() * 20) - 10 // Random trend between -10 and +10
-    }));
+    // Calculate trends for each clinic type based on last 30 days vs previous period
+    const clinicDataArray = allowedClinics.map((clinicType) => {
+      const currentCount = clinicCounts[clinicType] || 0;
+      
+      // Calculate trend based on registrations in last 30 days vs previous period
+      const now = new Date();
+      const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+      
+      const recentCount = facilities.filter(f => 
+        f.clinicType === clinicType && 
+        f.createdDate && 
+        new Date(f.createdDate.seconds * 1000) > thirtyDaysAgo
+      ).length;
+      
+      const previousCount = facilities.filter(f => 
+        f.clinicType === clinicType && 
+        f.createdDate && 
+        new Date(f.createdDate.seconds * 1000) > sixtyDaysAgo &&
+        new Date(f.createdDate.seconds * 1000) <= thirtyDaysAgo
+      ).length;
+      
+      let trend = 0;
+      if (previousCount > 0) {
+        trend = Math.round(((recentCount - previousCount) / previousCount) * 100);
+      } else if (recentCount > 0) {
+        trend = 100; // infinite growth from 0
+      }
+      
+      return {
+        title: clinicType,
+        value: currentCount,
+        trend: trend
+      };
+    });
 
     setClinicData(clinicDataArray);
 
@@ -469,44 +527,40 @@ const Dashboard = () => {
 
     setStatusData(statusDataArray);
 
-    // Calculate yearly and monthly totals with trends
-    // const currentYear = new Date().getFullYear();
-    // const lastYear = currentYear - 1;
-    
-    // This is simplified - you would need to use createdAt timestamps in your actual data
-    // const currentYearCount = facilities.length; // Replace with actual filtered count
-    // const lastYearCount = Math.floor(facilities.length * 0.9); // Demo data
-    
-    // const yearlyTrend = ((currentYearCount - lastYearCount) / lastYearCount) * 100;
-    // setYearlyData({
-    //   total: currentYearCount,
-    //   trend: yearlyTrend
-    // });
-
-    // Monthly data
-    // const currentMonthCount = Math.floor(facilities.length / 12); // Demo data
-    // const lastMonthCount = Math.floor(currentMonthCount * 0.97); // Demo data
-    // const monthlyTrend = ((currentMonthCount - lastMonthCount) / lastMonthCount) * 100;
-    // setMonthlyData({
-    //   total: currentMonthCount,
-    //   trend: monthlyTrend
-    // });
-
     // Generate registration chart data (monthly)
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const chartData = months.map((month) => ({
-      name: month,
-      value: Math.floor(Math.random() * 1000) + 500 // Random data for demo
-    }));
-    setRegistrationChartData(chartData);
+    const now = new Date();
+    const monthsData: Record<string, number> = {};
+    
+    // Initialize last 12 months
+    for (let i = 0; i < 12; i++) {
+      const date = new Date(now);
+      date.setMonth(now.getMonth() - i);
+      const monthYear = date.toLocaleString('default', { month: 'short' }) + ' ' + date.getFullYear();
+      monthsData[monthYear] = 0;
+    }
+    
+    // Count registrations per month
+    facilities.forEach(facility => {
+      if (facility.createdDate) {
+        const date = new Date(facility.createdDate.seconds * 1000);
+        const monthYear = date.toLocaleString('default', { month: 'short' }) + ' ' + date.getFullYear();
+        
+        if (monthsData.hasOwnProperty(monthYear)) {
+          monthsData[monthYear]++;
+        }
+      }
+    });
+    
+    // Convert to chart data format and reverse to show chronological order
+    // const chartData = Object.entries(monthsData)
+    //   .map(([name, value]) => ({ name, value }))
+    //   .reverse();
+    
+    // setRegistrationChartData(chartData);
   };
 
   const SINDH_CENTER = { lat: 25.396, lng: 68.3578 };
   const SINDH_BOUNDS = { north: 28.5, south: 23.5, east: 71.0, west: 66.0 };
-
-  // const filteredMarkers = selectedCity
-  //   ? markers.filter((marker) => marker.cityName === selectedCity)
-  //   : markers;
 
   const mapContainerStyle = {
     width: "100%",
@@ -516,29 +570,15 @@ const Dashboard = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Registered":
-        return "#696969";       // Dark Blue
+        return "#696969";
       case "Un-Registered":
-        return "#b61319";       // Dark Red
+        return "#b61319";
       case "Licensed":
-        return "#006400";       // Dark Green
-
+        return "#006400";
       default:
-        return "bg-[#696969]";       // Dim Gray
+        return "#696969";
     }
   };
-
-  // const getStatusTextColor = (status: string) => {
-  //   switch (status) {
-  //     case "Registered":
-  //       return "text-success";
-  //     case "UnRegistered":
-  //       return "text-danger";
-  //     case "Licensed":
-  //       return "text-primary";
-  //     default:
-  //       return "text-secondary";
-  //   }
-  // };
 
   if (loadError) return <div>Error loading maps</div>;
   if (!isLoaded) return <div>Loading Maps...</div>;
@@ -566,16 +606,13 @@ const Dashboard = () => {
                       let iconUrl = "";
                       switch (marker.status) {
                         case "Registered":
-                          // iconUrl = "http://maps.google.com/mapfiles/ms/icons/green-dot.png";
                           iconUrl = "/assets/images/logos/logo.png";
                           break;
                         case "UnRegistered":
                           iconUrl = "/assets/images/logos/logo.png";
-                          // iconUrl = "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
                           break;
                         case "Licensed":
                           iconUrl = "/assets/images/logos/logo.png";
-                          // iconUrl = "http://maps.google.com/mapfiles/ms/icons/blue-dot.png";
                           break;
                         default:
                           return null;
@@ -611,23 +648,48 @@ const Dashboard = () => {
                   <div className="card-body">
                     <h5 className="card-title fw-semibold">Monthly Registrations</h5>
                     <div style={{ height: "200px" }}>
-                    <ResponsiveContainer width="100%" height="100%">
+                      {/* <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={registrationChartData}>
+                          <XAxis 
+                            dataKey="name"  
+                            tick={{ fill: '#666', fontSize: 12 }}
+                          />
+                          <YAxis 
+                            tick={{ fill: '#666', fontSize: 12 }}
+                          />
+                          <Tooltip />
+                          <Line 
+                            type="monotone" 
+                            dataKey="value" 
+                            stroke="#b61319" 
+                            strokeWidth={2} 
+                            dot={{ r: 4 }} 
+                            activeDot={{ r: 6 }} 
+                          />
+                        </LineChart>
+                      </ResponsiveContainer> */}
+                      
+
+<ResponsiveContainer width="100%" height="100%">
   <LineChart data={registrationChartData}>
     <XAxis 
-      dataKey="name"  // assuming your data has a "name" property for X-axis
-      tick={{ fill: '#666', fontSize: 12 }}  // optional styling
+      dataKey="name"  
+      tick={{ fill: '#666', fontSize: 12 }}
     />
     <YAxis 
-      tick={{ fill: '#666', fontSize: 12 }}  // optional styling
+      tick={{ fill: '#666', fontSize: 12 }}
     />
-    <Tooltip />
+    <Tooltip 
+      formatter={(value: number) => [`${value} Registrations`, 'Count']}
+      labelFormatter={(label) => `Month: ${label}`}
+    />
     <Line 
       type="monotone" 
       dataKey="value" 
       stroke="#b61319" 
       strokeWidth={2} 
       dot={{ r: 4 }} 
-      activeDot={{ r: 6 }} 
+      activeDot={{ r: 6, fill: '#b61319', strokeWidth: 0 }} 
     />
   </LineChart>
 </ResponsiveContainer>
@@ -639,49 +701,47 @@ const Dashboard = () => {
                 <div className="row">
                   {statusData.map((status, index) => (
                     <div className="col-md-4 mb-3" key={index}>
-   <div 
-  className="card position-relative overflow-hidden" 
-  style={{ 
-    height: "120px",
-    backgroundColor: getStatusColor(status.title),
-    color: "white",
-    borderRadius: "10px"
-  }}
->
-  {/* Left top half circle */}
-  <div 
-    style={{
-      position: "absolute",
-      top: "-20px",
-      left: "-20px",
-      width: "80px",
-      height: "80px",
-      borderRadius: "50%",
-      backgroundColor: "rgba(255, 255, 255, 0.15)"
-    }}
-  ></div>
-  
-  {/* Bottom right half circle */}
-  <div 
-    style={{
-      position: "absolute",
-      bottom: "-30px",
-      right: "-30px",
-      width: "120px",
-      height: "120px",
-      borderRadius: "50%",
-      backgroundColor: "rgba(255, 255, 255, 0.1)"
-    }}
-  ></div>
+                      <div 
+                        className="card position-relative overflow-hidden" 
+                        style={{ 
+                          height: "120px",
+                          backgroundColor: getStatusColor(status.title),
+                          color: "white",
+                          borderRadius: "10px"
+                        }}
+                      >
+                        <div 
+                          style={{
+                            position: "absolute",
+                            top: "-20px",
+                            left: "-20px",
+                            width: "80px",
+                            height: "80px",
+                            borderRadius: "50%",
+                            backgroundColor: "rgba(255, 255, 255, 0.15)"
+                          }}
+                        ></div>
+                        
+                        <div 
+                          style={{
+                            position: "absolute",
+                            bottom: "-30px",
+                            right: "-30px",
+                            width: "120px",
+                            height: "120px",
+                            borderRadius: "50%",
+                            backgroundColor: "rgba(255, 255, 255, 0.1)"
+                          }}
+                        ></div>
 
-  <div className="card-body position-relative d-flex flex-column justify-content-between h-100">
-    <h6 className="mb-1 text-white fw-semibold" style={{ fontSize: "0.9rem" }}>{status.title}</h6>
-    <div>
-      <h3 className="mb-0 text-white fw-bold" style={{ fontSize: "1.8rem" }}>{status.value}</h3>
-    </div>
-  </div>
-</div>
-  </div>
+                        <div className="card-body position-relative d-flex flex-column justify-content-between h-100">
+                          <h6 className="mb-1 text-white fw-semibold" style={{ fontSize: "0.9rem" }}>{status.title}</h6>
+                          <div>
+                            <h3 className="mb-0 text-white fw-bold" style={{ fontSize: "1.8rem" }}>{status.value}</h3>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -689,8 +749,8 @@ const Dashboard = () => {
           </div>
 
           {/* Clinic Cards with Chart */}
-          <div className="col-lg-5 ">
-            <div className="card " style={{paddingBottom:""}}>
+          <div className="col-lg-5">
+            <div className="card" style={{paddingBottom: ""}}>
               <div className="card-body">
                 <h5 className="card-title fw-semibold mb-3">Clinic Types</h5>
                 <div className="row">
@@ -709,31 +769,31 @@ const Dashboard = () => {
                                 <FaArrowDown className="text-danger me-2" />
                               )}
                               <p className={`mb-0 ${isPositiveTrend ? 'text-success' : 'text-danger'}`}>
-                                {Math.abs(clinic.trend)}% this year
+                                {Math.abs(clinic.trend)}% {isPositiveTrend ? 'increase' : 'decrease'}
                               </p>
                             </div>
                             <ResponsiveContainer width="100%" height={40}>
-  <LineChart data={registrationChartData.slice(0, 4)}>
-    <XAxis 
-      dataKey="name"  // अपने data के अनुसार key adjust करें
-      tick={{ fontSize: 10 }}  // छोटा font size
-      height={12}  // axis का height कम करें
-    />
-    <YAxis 
-      width={20}  // axis का width कम करें
-      tick={{ fontSize: 10 }}  // छोटा font size
-      tickCount={3}  // limited ticks
-    />
-    <Tooltip />
-    <Line 
-      type="monotone" 
-      dataKey="value" 
-      stroke={isPositiveTrend ? "#28a745" : "#dc3545"} 
-      strokeWidth={2} 
-      dot={false} 
-    />
-  </LineChart>
-</ResponsiveContainer>
+                              <LineChart data={registrationChartData.slice(0, 4)}>
+                                <XAxis 
+                                  dataKey="name"
+                                  tick={{ fontSize: 10 }}
+                                  height={12}
+                                />
+                                <YAxis 
+                                  width={20}
+                                  tick={{ fontSize: 10 }}
+                                  tickCount={3}
+                                />
+                                <Tooltip />
+                                <Line 
+                                  type="monotone" 
+                                  dataKey="value" 
+                                  stroke={isPositiveTrend ? "#28a745" : "#dc3545"} 
+                                  strokeWidth={2} 
+                                  dot={false} 
+                                />
+                              </LineChart>
+                            </ResponsiveContainer>
                           </div>
                         </div>
                       </div>
@@ -744,68 +804,6 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-
-        {/* Registration Stats
-        <div className="row mt-4">
-          <div className="col-md-6 mb-4">
-            <div className="card h-100">
-              <div className="card-body">
-                <h5 className="card-title fw-semibold">
-                  <FaChartLine className="me-2" /> Yearly Registration Breakup
-                </h5>
-                <h2 className="fw-semibold mb-3">{yearlyData.total.toLocaleString()}</h2>
-                <div className="d-flex align-items-center">
-                  {yearlyData.trend >= 0 ? (
-                    <FaArrowUp className="text-success me-2" />
-                  ) : (
-                    <FaArrowDown className="text-danger me-2" />
-                  )}
-                  <p className={`me-1 fs-3 mb-0 ${yearlyData.trend >= 0 ? 'text-success' : 'text-danger'}`}>
-                    {yearlyData.trend >= 0 ? '+' : ''}{yearlyData.trend.toFixed(1)}%
-                  </p>
-                  <p className="fs-3 mb-0">last year</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="col-md-6 mb-4">
-            <div className="card h-100">
-              <div className="card-body">
-                <h5 className="card-title fw-semibold">
-                  <FaCalendarAlt className="me-2" /> Monthly Registration
-                </h5>
-                <h2 className="fw-semibold mb-3">{monthlyData.total.toLocaleString()}</h2>
-                <div className="d-flex align-items-center">
-                  {monthlyData.trend >= 0 ? (
-                    <FaArrowUp className="text-success me-2" />
-                  ) : (
-                    <FaArrowDown className="text-danger me-2" />
-                  )}
-                  <p className={`me-1 fs-3 mb-0 ${monthlyData.trend >= 0 ? 'text-success' : 'text-danger'}`}>
-                    {monthlyData.trend >= 0 ? '+' : ''}{monthlyData.trend.toFixed(1)}%
-                  </p>
-                  <p className="fs-3 mb-0">last year</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div> */}
-
-        {/* Footer */}
-        {/* <div className="py-4 px-6 text-center bg-light mt-4">
-          <p className="mb-0 fs-4">
-            Developed in:{" "}
-            <a
-              href="https://adminmart.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="pe-1 text-primary text-decoration-underline"
-            >
-              March 2025
-            </a>
-          </p>
-        </div> */}
       </div>
     </div>
   );

@@ -444,7 +444,7 @@ const formatTimestamp = (timestamp: TimestampType): string => {
     new Set(facilities.map(f => f.cityName).filter((name): name is string => Boolean(name)))
   );
   
-  const statuses = ["Licensed", "Registered", "Un-Registered", "Pending"];
+  const statuses = ["Licensed", "Registered", "Un-Registered"];
   const clinicTypes = [
     "Dental Clinic",
     "Homeopathy Clinic",
