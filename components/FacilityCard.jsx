@@ -268,6 +268,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { firestore, collection, doc, updateDoc, onSnapshot, deleteDoc } from '../app/lib/firebase-config';
+import EditFacilityModal from '../components/editfacility';
 const FacilityCard = () => {
   const [city, setCity] = useState([]);
   const [facilities, setFacilities] = useState([]);
@@ -288,7 +289,20 @@ const [showDentalModal, setShowDentalModal] = useState(false);
     licenseImage: null
   });
   const [newStatus, setNewStatus] = useState(''); // Track the new status for confirmation
+  const [showEditModal, setShowEditModal] = useState(false);
 
+  // Add this function to handle edit click
+  const handleEditClick = (facility) => {
+    setSelectedFacility(facility);
+    setShowEditModal(true);
+  };
+  
+  // Add this function to handle successful update
+  const handleFacilityUpdate = () => {
+    // You might want to refresh your facilities data here
+    // or let the real-time listener handle the update
+    setShowEditModal(false);
+  };
   useEffect(() => {
     const facilitiesRef = collection(firestore, 'facility_selections');
   
@@ -554,7 +568,7 @@ const [showDentalModal, setShowDentalModal] = useState(false);
                   </td>
                   <td>
   <div style={{ display: "flex", gap: "8px" }}>
-    <button
+    {/* <button
       className="btn btn-sm"
       style={{
         backgroundColor: "rgb(24, 80, 16)",
@@ -562,7 +576,26 @@ const [showDentalModal, setShowDentalModal] = useState(false);
       }}
     >
       Edit
-    </button>
+    </button> */}
+{showEditModal && (
+  <EditFacilityModal 
+    facility={selectedFacility}
+    onClose={() => setShowEditModal(false)}
+    onUpdate={handleFacilityUpdate}
+  />
+)}
+
+
+<button
+  className="btn btn-sm"
+  style={{
+    backgroundColor: "rgb(24, 80, 16)",
+    color: "white",
+  }}
+  onClick={() => handleEditClick(facility)}
+>
+  Edit
+</button>
     {/* <button
       className="btn btn-sm"
       style={{
